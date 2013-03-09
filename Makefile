@@ -32,15 +32,15 @@ update-repo-current:
 	done
 
 update-repo-current-testing:
-	ln -f $(RPMS_DIR)/x86_64/qubes-libvchan-$(VERSION)*$(DIST_DOM0)*.rpm ../yum/current-testing-release/current/dom0/rpm/
-	for vmrepo in ../yum/current-testing-release/current/vm/* ; do \
+	ln -f $(RPMS_DIR)/x86_64/qubes-libvchan-$(VERSION)*$(DIST_DOM0)*.rpm ../yum/current-release/current-testing/dom0/rpm/
+	for vmrepo in ../yum/current-release/current-testing/vm/* ; do \
 		dist=$$(basename $$vmrepo) ;\
 		ln -f $(RPMS_DIR)/x86_64/qubes-libvchan-$(VERSION)*$$dist*.rpm $$vmrepo/rpm/;\
 	done
 
 update-repo-unstable:
-	ln -f $(RPMS_DIR)/x86_64/qubes-libvchan-$(VERSION)*$(DIST_DOM0)*.rpm ../yum/unstable-release/current/dom0/rpm/
-	for vmrepo in ../yum/unstable-release/current/vm/* ; do \
+	ln -f $(RPMS_DIR)/x86_64/qubes-libvchan-$(VERSION)*$(DIST_DOM0)*.rpm ../yum/current-release/unstable/dom0/rpm/
+	for vmrepo in ../yum/current-release/unstable/vm/* ; do \
 		dist=$$(basename $$vmrepo) ;\
 		ln -f $(RPMS_DIR)/x86_64/qubes-libvchan-$(VERSION)*$$dist*.rpm $$vmrepo/rpm/;\
 	done
