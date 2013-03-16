@@ -23,7 +23,7 @@
 
 %{!?version: %define version %(cat version)}
 
-Name:		qubes-libvchan
+Name:		qubes-libvchan-xen
 Version:	%{version}
 Release:	1%{dist}
 
@@ -35,6 +35,7 @@ Vendor:		Invisible Things Lab
 URL:		http://www.qubes-os.org
 Obsoletes:  qubes-core-libs < 2.1.2
 Provides:   qubes-core-libs
+Provides:   qubes-libvchan
 BuildRequires: xen-devel
 
 %define _builddir %(pwd)
@@ -77,6 +78,7 @@ Obsoletes:      qubes-core-appvm-devel
 Obsoletes:      qubes-core-vm-devel
 Obsoletes:      qubes-core-libs-devel < 2.1.2
 Provides:       qubes-core-libs-devel
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 
