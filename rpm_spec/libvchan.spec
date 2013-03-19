@@ -78,6 +78,7 @@ Obsoletes:      qubes-core-appvm-devel
 Obsoletes:      qubes-core-vm-devel
 Obsoletes:      qubes-core-libs-devel < 2.1.2
 Provides:       qubes-core-libs-devel
+Provides:       qubes-libvchan-devel
 Requires:       %{name} = %{version}-%{release}
 
 %description devel
