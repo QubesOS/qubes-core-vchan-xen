@@ -5,7 +5,7 @@
 
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-libvchan-xen
-pkgver=2.1.2
+pkgver=`cat version`
 pkgrel=1
 
 epoch=
