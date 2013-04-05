@@ -40,7 +40,11 @@
 
 #endif
 
+#if __XEN_INTERFACE_VERSION__ >= 0x00040200
+#include <xenstore.h>
+#else
 #include <xs.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include "libvchan.h"

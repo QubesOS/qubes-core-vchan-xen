@@ -21,7 +21,7 @@
 
 # Assume it is placed as xen-root/tools/vchan
 
-XEN_ROOT = ../..
+XEN_ROOT = $(CURDIR)/../..
 include $(XEN_ROOT)/tools/Rules.mk
 
 CFLAGS+=-Wall -I$(XEN_ROOT)/tools/libxc -DCONFIG_STUBDOM
