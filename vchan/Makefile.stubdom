@@ -24,10 +24,10 @@
 XEN_ROOT = $(CURDIR)/../..
 include $(XEN_ROOT)/tools/Rules.mk
 
-CFLAGS+=-Wall -Wextra -Werror -I$(XEN_ROOT)/tools/libxc -DCONFIG_STUBDOM
+CFLAGS+=-Wall -Wextra -Werror -I$(XEN_ROOT)/tools/libxc -I$(XEN_ROOT)/tools/libvchan -DCONFIG_STUBDOM
 all: libvchan.a
 
-libvchan.a: init.o io.o
+libvchan.a: init.o
 	    $(AR) rc $@ $^
 
 clean:
