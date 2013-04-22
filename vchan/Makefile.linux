@@ -20,11 +20,13 @@
 #
 
 CC=gcc
-all: libvchan.so
 CFLAGS=-g -Wall -Wextra -Werror -fPIC -O2
+all: libvchan-xen.so vchan-xen.pc
 
-libvchan.so : init.o
-	gcc -shared -o libvchan.so init.o -lxenvchan
+libvchan-xen.so : init.o
+	gcc -shared -o libvchan-xen.so init.o -lxenvchan
 clean:
 	rm -f *.o *so *~ client server node node-select
 
+vchan-xen.pc: vchan-xen.pc.in
+	sed -e "s/@VERSION@/`cat ../version`/" $< > $@

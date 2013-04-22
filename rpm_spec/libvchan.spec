@@ -36,7 +36,7 @@ URL:		http://www.qubes-os.org
 Obsoletes:  qubes-core-libs < 2.1.2
 Provides:   qubes-core-libs
 Provides:   qubes-libvchan
-BuildRequires: xen-devel
+BuildRequires: xen-devel >= 4.2
 
 %define _builddir %(pwd)
 
@@ -55,11 +55,12 @@ ln -sf . %{name}-%{version}
 (cd vchan; make -f Makefile.linux)
 
 %install
-install -D -m 0644 vchan/libvchan.h $RPM_BUILD_ROOT/usr/include/libvchan.h
-install -D -m 0644 u2mfn/u2mfnlib.h $RPM_BUILD_ROOT/usr/include/u2mfnlib.h
-install -D -m 0644 u2mfn/u2mfn-kernel.h $RPM_BUILD_ROOT/usr/include/u2mfn-kernel.h
+install -D -m 0644 vchan/libvchan.h $RPM_BUILD_ROOT%{_includedir}/vchan-xen/libvchan.h
+install -D -m 0644 u2mfn/u2mfnlib.h $RPM_BUILD_ROOT%{_includedir}/u2mfnlib.h
+install -D -m 0644 u2mfn/u2mfn-kernel.h $RPM_BUILD_ROOT%{_includedir}/u2mfn-kernel.h
+install -D -m 0644 vchan/vchan-xen.pc $RPM_BUILD_ROOT/%{_libdir}/pkgconfig/vchan-xen.pc
 
-install -D vchan/libvchan.so $RPM_BUILD_ROOT/%{_libdir}/libvchan.so
+install -D vchan/libvchan-xen.so $RPM_BUILD_ROOT/%{_libdir}/libvchan-xen.so
 install -D u2mfn/libu2mfn.so $RPM_BUILD_ROOT/%{_libdir}/libu2mfn.so
 
 %clean
@@ -67,7 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 rm -f %{name}-%{version}
 
 %files
-%{_libdir}/libvchan.so
+%{_libdir}/libvchan-xen.so
 %{_libdir}/libu2mfn.so
 
 %package devel
@@ -81,10 +82,12 @@ Provides:      qubes-core-vm-devel
 Provides:       qubes-core-libs-devel
 Provides:       qubes-libvchan-devel
 Requires:       %{name} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 
 %files devel
-/usr/include/libvchan.h
-/usr/include/u2mfnlib.h
-/usr/include/u2mfn-kernel.h
+%{_includedir}/vchan-xen/libvchan.h
+%{_libdir}/pkgconfig/vchan-xen.pc
+%{_includedir}/u2mfnlib.h
+%{_includedir}/u2mfn-kernel.h

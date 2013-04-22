@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib64
+
+Name: vchan-xen
+Description: The vchan communication library
+Version: @VERSION@
+Cflags: -I${includedir}/vchan-xen
+Libs: -lvchan-xen -lxenvchan
