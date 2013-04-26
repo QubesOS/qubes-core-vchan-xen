@@ -6,7 +6,7 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-libvchan-xen
 pkgver=`cat version`
-pkgrel=1
+pkgrel=2
 
 epoch=
 pkgdesc="The Qubes core libraries for installation inside a Qubes Dom0 and VM."
@@ -20,7 +20,7 @@ checkdepends=()
 optdepends=()
 provides=('qubes-core-libs' 'qubes-libvchan')
 conflicts=()
-replaces=('qubes-vm-core')
+replaces=('')
 backup=()
 options=()
 install=
