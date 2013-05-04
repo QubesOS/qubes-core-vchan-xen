@@ -50,8 +50,6 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
 
 libvchan_t *libvchan_client_init(int domain, int port);
 
-char *libvchan_get_domain_name(int domain);
-
 static inline int libvchan_write(libvchan_t *ctrl, const void *data, size_t size) {
     return libxenvchan_write(ctrl, (char*)data, size);
 }

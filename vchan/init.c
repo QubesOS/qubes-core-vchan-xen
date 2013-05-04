@@ -38,27 +38,6 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
 
 #ifndef WINNT
 
-char *libvchan_get_domain_name(int domain) {
-    char xs_path[255];
-    struct xs_handle *xs;
-    unsigned int len = 0;
-    char *name;
-
-    snprintf(xs_path, sizeof(xs_path), "/local/domain/%d/name", domain);
-    xs = xs_daemon_open();
-    if (!xs) {
-        perror("xs_daemon_open");
-        return NULL;
-    }
-    name = xs_read(xs, 0, xs_path, &len);
-    if (!name) {
-        perror("xs_read");
-        return NULL;
-    }
-    xs_daemon_close(xs);
-    return name;
-}
-
 libvchan_t *libvchan_client_init(int domain, int port) {
     char xs_path[255];
     libvchan_t *ctrl;
@@ -98,10 +77,6 @@ libvchan_t *libvchan_client_init(int domain, int port) {
 // Client side not implemented on Windows domains yet
 
 libvchan_t *libvchan_client_init(int domain, int port) {
-	return NULL;
-}
-
-char *libvchan_get_domain_name(int domain) {
 	return NULL;
 }
 
