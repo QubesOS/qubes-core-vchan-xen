@@ -24,9 +24,23 @@
 #include <xenstore.h>
 #include "libvchan.h"
 
+/* intentionally use common xc_interface for all libvchan connections, it
+ * doesn't hold any connection-specific informations; it is used only in
+ * libvchan_is_open
+ */
+xc_interface *xc_handle = NULL;
+
 libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t write_min) {
     char xs_path[255];
     libvchan_t *ctrl;
+
+    if (!xc_handle) {
+        xc_handle = xc_interface_open(NULL, NULL, 0);
+        if (!xc_handle) {
+            /* error already logged by xc_interface_open */
+            return NULL;
+        }
+    }
 
     snprintf(xs_path, sizeof(xs_path), "data/vchan/%d/%d", domain, port);
     ctrl = libxenvchan_server_init(NULL, domain, xs_path, read_min, write_min);
@@ -45,6 +59,14 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     char **vec;
     unsigned int count, len;
     char *dummy;
+
+    if (!xc_handle) {
+        xc_handle = xc_interface_open(NULL, NULL, 0);
+        if (!xc_handle) {
+            /* error already logged by xc_interface_open */
+            return NULL;
+        }
+    }
 
     /* FIXME: get own domain ID instead of hardcoded "0" here */
     snprintf(xs_path, sizeof(xs_path), "/local/domain/%d/data/vchan/0/%d", domain, port);

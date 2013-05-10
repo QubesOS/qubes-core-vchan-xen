@@ -72,9 +72,8 @@ static inline EVTCHN libvchan_fd_for_select(libvchan_t *ctrl) {
     /* TODO: Windows */
     return libxenvchan_fd_for_select(ctrl);
 }
-static inline int libvchan_is_open(libvchan_t *ctrl) {
-    return libxenvchan_is_open(ctrl);
-}
+int libvchan_is_open(libvchan_t *ctrl);
+
 static inline int libvchan_data_ready(libvchan_t *ctrl) {
     return libxenvchan_data_ready(ctrl);
 }
