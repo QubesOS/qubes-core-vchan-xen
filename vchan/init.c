@@ -91,6 +91,8 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     if (!ctrl)
         return NULL;
     ctrl->blocking = 1;
+    /* notify server */
+    xc_evtchn_notify(ctrl->event, ctrl->event_port);
     return ctrl;
 }
 
