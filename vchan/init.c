@@ -39,6 +39,7 @@
 #endif
 
 #endif
+#include <assert.h>
 
 #if __XEN_INTERFACE_VERSION__ >= 0x00040200
 #include <xenstore.h>
@@ -239,7 +240,6 @@ int libvchan_cleanup(struct libvchan *ctrl)
 	/* not implemented yet, need to store gntmem_handle from ring_init somewhere */
 	assert(0);
 	/* in case of disabled assertions */
-	errno = EINVAL;
 	return -1;
 #else /* QREXEC_RING_V2 */
 #ifdef CONFIG_STUBDOM
