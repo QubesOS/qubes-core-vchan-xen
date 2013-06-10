@@ -86,23 +86,45 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         return NULL;
     }
 
-    own_domid = xs_read(xs, 0, "domid", &len);
-    if (!own_domid) {
-        fprintf(stderr, "Cannot get own domid\n");
+    own_domid = NULL;
+
+    if (!xs_watch(xs, "domid", "domid")) {
+        fprintf(stderr, "Cannot setup xenstore watch\n");
         xs_close(xs);
         return NULL;
     }
-
-    snprintf(xs_path, sizeof(xs_path), "/local/domain/%d/data/vchan/%s/%d",
-            domain, own_domid, port);
-    /* watch on this key as we might not have access to whole directory */
-    snprintf(xs_path_watch, sizeof(xs_path_watch), "%s/event-channel", xs_path);
-
-    xs_watch(xs, xs_path_watch, xs_path_watch);
     do {
+        if (!own_domid) {
+            /* construct xenstore path on first iteration and on every domid
+             * change detected (save+restore case */
+            own_domid = xs_read(xs, 0, "domid", &len);
+            if (!own_domid) {
+                fprintf(stderr, "Cannot get own domid\n");
+                xs_close(xs);
+                return NULL;
+            }
+
+            snprintf(xs_path, sizeof(xs_path), "/local/domain/%d/data/vchan/%s/%d",
+                    domain, own_domid, port);
+            /* watch on this key as we might not have access to whole directory */
+            snprintf(xs_path_watch, sizeof(xs_path_watch), "%s/event-channel", xs_path);
+
+            if (!xs_watch(xs, xs_path_watch, xs_path_watch)) {
+                fprintf(stderr, "Cannot setup watch on %s\n", xs_path_watch);
+                xs_close(xs);
+                return NULL;
+            }
+        }
         vec = xs_read_watch(xs, &count);
-        if (vec)
+        if (vec) {
+            if (strcmp(vec[XS_WATCH_TOKEN], "domid") == 0) {
+                /* domid have changed -> reread it on next iteration */
+                free(own_domid);
+                own_domid = NULL;
+                xs_unwatch(xs, xs_path_watch, xs_path_watch);
+            }
             free(vec);
+        }
         dummy = xs_read(xs, 0, xs_path_watch, &len);
     } while (!dummy);
     free(dummy);
