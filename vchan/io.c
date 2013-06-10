@@ -24,26 +24,79 @@
 #include <stdlib.h>
 #include <xenstore.h>
 #include "libvchan.h"
+#include "libvchan_private.h"
 
 extern xc_interface *xc_handle;
+
+int libvchan_write(libvchan_t *ctrl, const void *data, size_t size) {
+    return libxenvchan_write(ctrl->xenvchan, (char*)data, size);
+}
+
+int libvchan_send(libvchan_t *ctrl, void *data, size_t size) {
+    return libxenvchan_send(ctrl->xenvchan, (char*)data, size);
+}
+
+int libvchan_read(libvchan_t *ctrl, void *data, size_t size) {
+    return libxenvchan_read(ctrl->xenvchan, (char*)data, size);
+}
+
+int libvchan_recv(libvchan_t *ctrl, void *data, size_t size) {
+    return libxenvchan_recv(ctrl->xenvchan, (char*)data, size);
+}
+
+int libvchan_wait(libvchan_t *ctrl) {
+    return libxenvchan_wait(ctrl->xenvchan);
+}
+
+void libvchan_close(libvchan_t *ctrl) {
+    struct xs_handle *xs;
+
+    libxenvchan_close(ctrl->xenvchan);
+    if (ctrl->xs_path) {
+        /* remove xenstore entry */
+        xs = xs_open(0);
+        if (xs) {
+            /* if xenstore connection failed just do not remove entries, but do
+             * not abort whole function, especially still free the memory
+             */
+            xs_rm(xs, 0, ctrl->xs_path);
+            xs_close(xs);
+        }
+        free(ctrl->xs_path);
+    }
+    free(ctrl);
+}
+
+EVTCHN libvchan_fd_for_select(libvchan_t *ctrl) {
+    /* TODO: Windows */
+    return libxenvchan_fd_for_select(ctrl->xenvchan);
+}
+
+int libvchan_data_ready(libvchan_t *ctrl) {
+    return libxenvchan_data_ready(ctrl->xenvchan);
+}
+
+int libvchan_buffer_space(libvchan_t *ctrl) {
+    return libxenvchan_buffer_space(ctrl->xenvchan);
+}
 
 int libvchan_is_open(libvchan_t *ctrl) {
     int ret;
     struct evtchn_status evst;
 
-    ret =  libxenvchan_is_open(ctrl);
+    ret =  libxenvchan_is_open(ctrl->xenvchan);
     if (!ret)
         return ret;
     /* slow check in case of domain destroy */
-    evst.port = ctrl->event_port;
+    evst.port = ctrl->xenvchan->event_port;
     evst.dom = DOMID_SELF;
     if (xc_evtchn_status(xc_handle, &evst)) {
         perror("xc_evtchn_status");
         return 0;
     }
     if (evst.status != EVTCHNSTAT_interdomain) {
-        if (!ctrl->is_server)
-            ctrl->ring->srv_live = 0;
+        if (!ctrl->xenvchan->is_server)
+            ctrl->xenvchan->ring->srv_live = 0;
         return 0;
     }
     return ret;

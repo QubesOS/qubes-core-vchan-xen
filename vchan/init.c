@@ -21,8 +21,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <xenstore.h>
 #include "libvchan.h"
+#include "libvchan_private.h"
 
 /* intentionally use common xc_interface for all libvchan connections, it
  * doesn't hold any connection-specific informations; it is used only in
@@ -42,11 +44,18 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
         }
     }
 
-    snprintf(xs_path, sizeof(xs_path), "data/vchan/%d/%d", domain, port);
-    ctrl = libxenvchan_server_init(NULL, domain, xs_path, read_min, write_min);
+    ctrl = malloc(sizeof(*ctrl));
     if (!ctrl)
         return NULL;
-    ctrl->blocking = 1;
+
+    snprintf(xs_path, sizeof(xs_path), "data/vchan/%d/%d", domain, port);
+    ctrl->xenvchan = libxenvchan_server_init(NULL, domain, xs_path, read_min, write_min);
+    if (!ctrl->xenvchan) {
+        free(ctrl);
+        return NULL;
+    }
+    ctrl->xs_path = strdup(xs_path);
+    ctrl->xenvchan->blocking = 1;
     return ctrl;
 }
 
@@ -100,12 +109,18 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     free(own_domid);
     xs_close(xs);
 
-    ctrl = libxenvchan_client_init(NULL, domain, xs_path);
+    ctrl = malloc(sizeof(*ctrl));
     if (!ctrl)
         return NULL;
-    ctrl->blocking = 1;
+    ctrl->xs_path = NULL;
+    ctrl->xenvchan = libxenvchan_client_init(NULL, domain, xs_path);
+    if (!ctrl->xenvchan) {
+        free(ctrl);
+        return NULL;
+    }
+    ctrl->xenvchan->blocking = 1;
     /* notify server */
-    xc_evtchn_notify(ctrl->event, ctrl->event_port);
+    xc_evtchn_notify(ctrl->xenvchan->event, ctrl->xenvchan->event_port);
     return ctrl;
 }
 

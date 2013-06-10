@@ -44,41 +44,23 @@ typedef int EVTCHN;
 
 #include <libxenvchan.h>
 
-typedef struct libxenvchan libvchan_t;
+struct libvchan;
+typedef struct libvchan libvchan_t;
 
 libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t write_min);
 
 libvchan_t *libvchan_client_init(int domain, int port);
 
-static inline int libvchan_write(libvchan_t *ctrl, const void *data, size_t size) {
-    return libxenvchan_write(ctrl, (char*)data, size);
-}
-static inline int libvchan_send(libvchan_t *ctrl, void *data, size_t size) {
-    return libxenvchan_send(ctrl, (char*)data, size);
-}
-static inline int libvchan_read(libvchan_t *ctrl, void *data, size_t size) {
-    return libxenvchan_read(ctrl, (char*)data, size);
-}
-static inline int libvchan_recv(libvchan_t *ctrl, void *data, size_t size) {
-    return libxenvchan_recv(ctrl, (char*)data, size);
-}
-static inline int libvchan_wait(libvchan_t *ctrl) {
-    return libxenvchan_wait(ctrl);
-}
-static inline void libvchan_close(libvchan_t *ctrl) {
-    libxenvchan_close(ctrl);
-}
-static inline EVTCHN libvchan_fd_for_select(libvchan_t *ctrl) {
-    /* TODO: Windows */
-    return libxenvchan_fd_for_select(ctrl);
-}
+int libvchan_write(libvchan_t *ctrl, const void *data, size_t size);
+int libvchan_send(libvchan_t *ctrl, void *data, size_t size);
+int libvchan_read(libvchan_t *ctrl, void *data, size_t size);
+int libvchan_recv(libvchan_t *ctrl, void *data, size_t size);
+int libvchan_wait(libvchan_t *ctrl);
+void libvchan_close(libvchan_t *ctrl);
+EVTCHN libvchan_fd_for_select(libvchan_t *ctrl);
 int libvchan_is_open(libvchan_t *ctrl);
 
-static inline int libvchan_data_ready(libvchan_t *ctrl) {
-    return libxenvchan_data_ready(ctrl);
-}
-static inline int libvchan_buffer_space(libvchan_t *ctrl) {
-    return libxenvchan_buffer_space(ctrl);
-}
+int libvchan_data_ready(libvchan_t *ctrl);
+int libvchan_buffer_space(libvchan_t *ctrl);
 
 #endif /* _LIBVCHAN_H */
