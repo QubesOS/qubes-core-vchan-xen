@@ -97,6 +97,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         dummy = xs_read(xs, 0, xs_path_watch, &len);
     } while (!dummy);
     free(dummy);
+    free(own_domid);
     xs_close(xs);
 
     ctrl = libxenvchan_client_init(NULL, domain, xs_path);
