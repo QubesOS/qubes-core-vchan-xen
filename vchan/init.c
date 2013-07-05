@@ -401,7 +401,7 @@ static int client_interface_init(struct libvchan *ctrl, int domain, int devno)
 		break;
 	case 2:
 		xcg = xc_gnttab_open(NULL, 0);
-		if (xcg < 0)
+		if (!xcg)
 			goto fail;
 		ctrl->ring = (struct vchan_interface *)
 		    xc_gnttab_map_grant_ref(xcg, domain, ctrl->ring_ref, PROT_READ | PROT_WRITE);
