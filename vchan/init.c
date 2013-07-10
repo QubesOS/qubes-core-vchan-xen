@@ -80,7 +80,7 @@ static int ring_init(struct libvchan *ctrl)
 		return -1;
 
 	gntmem_set_local_quota(h, 1);
-	gntmem_set_global_quota(h, 1);
+	gntmem_set_global_quota(h, 1024);
 
 	memset(grants, 0, sizeof(grants));
 	ring = gntmem_grant_pages_to_domain(h, 0, 1, grants);
