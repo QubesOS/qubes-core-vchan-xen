@@ -51,6 +51,14 @@
 #include "libvchan.h"
 
 
+/* Windows interface requires to set system-wide limit of shared pages. 1024
+ * should be enough because vchan connection (in this version) uses only one
+ * page and Qubes uses three vchan channels: qubesdb, qrexec, gui. Even after
+ * switching to new vchan (xen 4.2) it should be enough as there vchan link
+ * uses at most 256 pages */
+#define GLOBAL_MAX_SHARED_PAGES 1024
+
+
 static int fill_ctrl(struct libvchan *ctrl, struct vchan_interface *ring, int ring_ref)
 {
 	if (!ctrl || !ring)
@@ -80,7 +88,7 @@ static int ring_init(struct libvchan *ctrl)
 		return -1;
 
 	gntmem_set_local_quota(h, 1);
-	gntmem_set_global_quota(h, 1024);
+	gntmem_set_global_quota(h, GLOBAL_MAX_SHARED_PAGES);
 
 	memset(grants, 0, sizeof(grants));
 	ring = gntmem_grant_pages_to_domain(h, 0, 1, grants);
