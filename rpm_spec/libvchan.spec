@@ -75,8 +75,9 @@ Summary:        Include files for qubes core libraries
 License:        GPL v2 only
 Group:          Development/Sources 
 Obsoletes:      qubes-core-appvm-devel
-Obsoletes:      qubes-core-vm-devel
+Obsoletes:      qubes-core-vm-devel < 2.1.2
 Obsoletes:      qubes-core-libs-devel < 2.1.2
+Provides:      qubes-core-vm-devel
 Provides:       qubes-core-libs-devel
 Provides:       qubes-libvchan-devel
 Requires:       %{name} = %{version}-%{release}
