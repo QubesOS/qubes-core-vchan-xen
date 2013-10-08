@@ -25,7 +25,7 @@
 #ifdef WINNT
 #include <windows.h>
 #include <xen_gntmem.h>
-#include <xs.h>
+#include <xenstore.h>
 typedef HANDLE EVTCHN;
 #define snprintf _snprintf
 #else /* WINNT */
