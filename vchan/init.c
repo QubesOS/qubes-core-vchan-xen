@@ -274,10 +274,14 @@ struct libvchan *libvchan_server_init(int devno)
 	    (struct libvchan *) malloc(sizeof(struct libvchan));
 	if (!ctrl)
 		return 0;
-	if (ring_init(ctrl))
-		return 0;;
-	if (server_interface_init(ctrl, devno))
+	if (ring_init(ctrl)) {
+		free(ctrl);
 		return 0;
+	}
+	if (server_interface_init(ctrl, devno)) {
+		free(ctrl);
+		return 0;
+	}
 /*
         We want the same code for read/write functions, regardless whether
         we are client, or server. Thus, we do not access buf_in nor buf_out
@@ -438,7 +442,7 @@ static int client_interface_init(struct libvchan *ctrl, int domain, int devno)
         xc_evtchn_close(evfd);
 	else
 		ret = 0;
-      fail:
+fail:
 	xs_daemon_close(xs);
 	return ret;
 }
@@ -453,8 +457,10 @@ struct libvchan *libvchan_client_init(int domain, int devno)
 	    (struct libvchan *) malloc(sizeof(struct libvchan));
 	if (!ctrl)
 		return 0;
-	if (client_interface_init(ctrl, domain, devno))
+	if (client_interface_init(ctrl, domain, devno)) {
+		free(ctrl);
 		return 0;
+	}
 //      See comment in libvchan_server_init
 	dir_select(out, in);
 	ctrl->is_server = 0;
