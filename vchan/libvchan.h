@@ -71,6 +71,13 @@ struct libvchan {
 	char *rd_ring, *wr_ring;
 	int rd_ring_size, wr_ring_size;
 	int is_server;
+#ifdef QREXEC_RING_V2
+	struct gntmem_handle *gmh;
+#else
+#ifndef CONFIG_STUBDOM
+	int u2mfn_fd;
+#endif
+#endif
 };
 
 struct libvchan *libvchan_server_init(int devno);

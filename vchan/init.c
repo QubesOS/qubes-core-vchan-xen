@@ -60,11 +60,8 @@
 #define GLOBAL_MAX_SHARED_PAGES 1024
 
 
-static int fill_ctrl(struct libvchan *ctrl, struct vchan_interface *ring, grant_ref_t ring_ref)
+static void fill_ctrl(struct libvchan *ctrl, struct vchan_interface *ring, grant_ref_t ring_ref)
 {
-	if (!ctrl || !ring)
-		return -1;
-
 	ctrl->ring = ring;
 	ctrl->ring_ref = ring_ref;
 
@@ -72,8 +69,6 @@ static int fill_ctrl(struct libvchan *ctrl, struct vchan_interface *ring, grant_
 	    0;
 	ring->server_closed = ring->client_closed = 0;
 	ring->debug = 0xaabbccdd;
-
-	return 0;	
 }
 
 #ifdef QREXEC_RING_V2
@@ -88,17 +83,29 @@ static int ring_init(struct libvchan *ctrl)
 	if (h == INVALID_HANDLE_VALUE)
 		return -1;
 
-	gntmem_set_local_quota(h, 1);
-	gntmem_set_global_quota(h, GLOBAL_MAX_SHARED_PAGES);
+	if (gntmem_set_local_quota(h, 1))
+		goto fail;
+	if (gntmem_set_global_quota(h, GLOBAL_MAX_SHARED_PAGES))
+		goto fail;
 
 	memset(grants, 0, sizeof(grants));
 	ring = gntmem_grant_pages_to_domain(h, 0, 1, grants);
-	if (!ring) {
-		gntmem_close(h);
-		return -1;
-	}
+	if (!ring)
+		goto fail;
 
-	return fill_ctrl(ctrl, ring, grants[0]);
+	fill_ctrl(ctrl, ring, grants[0]);
+
+	ctrl->gmh = h;
+	return 0;
+
+fail:
+	gntmem_close(h);
+	return -1;
+}
+
+static void ring_cleanup(struct libvchan *ctrl)
+{
+	gntmem_close(ctrl->gmh);
 }
 
 #else
@@ -109,9 +116,7 @@ static int ring_init(struct libvchan *ctrl)
 	int u2mfn_fd;
 	struct vchan_interface *ring;
 #ifdef CONFIG_STUBDOM
-	ring = (struct vchan_interface *) memalign(XC_PAGE_SIZE, sizeof(*ring));
-
-	if (!ring)
+	if (posix_memalign(&ring, XC_PAGE_SIZE, sizeof(*ring)) || !ring)
 		return -1;
 
 
@@ -122,14 +127,31 @@ static int ring_init(struct libvchan *ctrl)
 		return -1;
 	ring = (struct vchan_interface *) u2mfn_alloc_kpage_with_fd (u2mfn_fd);
 
-	if (ring == MAP_FAILED)
+	if (ring == MAP_FAILED) {
+		close(u2mfn_fd);
 		return -1;
+	}
 
-	if (u2mfn_get_last_mfn_with_fd (u2mfn_fd, &mfn) < 0)
+	if (u2mfn_get_last_mfn_with_fd (u2mfn_fd, &mfn) < 0) {
+		u2mfn_free_kpage ((char*)ring);
+		close(u2mfn_fd);
 		return -1;
+	}
+	ctrl->u2mfn_fd = u2mfn_fd;
 #endif
 
-	return fill_ctrl(ctrl, ring, mfn);
+	fill_ctrl(ctrl, ring, mfn);
+	return 0;
+}
+
+static void ring_cleanup(struct libvchan *ctrl)
+{
+#ifdef CONFIG_STUBDOM
+	free(ctrl->ring);
+#else /* CONFIG_STUBDOM */
+	u2mfn_free_kpage((char*)ctrl->ring);
+	close(ctrl->u2mfn_fd);
+#endif /* CONFIG_STUBDOM */
 }
 
 #endif
@@ -245,19 +267,7 @@ int libvchan_cleanup(struct libvchan *ctrl)
 	if (xc_evtchn_unbind(ctrl->evfd, ctrl->evport) < 0)
 		return -1;
         xc_evtchn_close(ctrl->evfd);
-#ifdef QREXEC_RING_V2
-	/* not implemented yet, need to store gntmem_handle from ring_init somewhere */
-	assert(0);
-	/* in case of disabled assertions */
-	return -1;
-#else /* QREXEC_RING_V2 */
-#ifdef CONFIG_STUBDOM
-	free(ctrl->ring);
-#else /* CONFIG_STUBDOM */
-	munmap(ctrl->ring, 4096);
-	/* FIXME: leak of u2mfn_fd, check u2mfnlib.c */
-#endif /* CONFIG_STUBDOM */
-#endif /* QREXEC_RING_V2 */
+	ring_cleanup(ctrl);
 	free(ctrl);
 	return 0;
 }
@@ -279,6 +289,7 @@ struct libvchan *libvchan_server_init(int devno)
 		return 0;
 	}
 	if (server_interface_init(ctrl, devno)) {
+		ring_cleanup(ctrl);
 		free(ctrl);
 		return 0;
 	}
@@ -344,10 +355,10 @@ static int client_interface_init(struct libvchan *ctrl, int domain, int devno)
 	struct xs_handle *xs;
 #ifdef XENCTRL_HAS_XC_INTERFACE
 	xc_interface *xcfd;
-	xc_gnttab *xcg;
+	xc_gnttab *xcg = NULL;
 #else
 	int xcfd;
-	int xcg;
+	int xcg = -1;
 #endif
 	char buf[64];
 	char *ref;
@@ -418,7 +429,6 @@ static int client_interface_init(struct libvchan *ctrl, int domain, int devno)
 			goto fail;
 		ctrl->ring = (struct vchan_interface *)
 		    xc_gnttab_map_grant_ref(xcg, domain, ctrl->ring_ref, PROT_READ | PROT_WRITE);
-		xc_gnttab_close(xcg);
 		break;
 	default:
 		goto fail;
@@ -429,20 +439,41 @@ static int client_interface_init(struct libvchan *ctrl, int domain, int devno)
 #ifdef XENCTRL_HAS_XC_INTERFACE
 	evfd = xc_evtchn_open(NULL, 0);
 	if (!evfd)
-		goto fail;
+		goto fail2;
 #else
 	evfd = xc_evtchn_open();
 	if (evfd < 0)
-		goto fail;
+		goto fail2;
 #endif
 	ctrl->evfd = evfd;
 	ctrl->evport =
 	    xc_evtchn_bind_interdomain(evfd, domain, remote_port);
-	if (ctrl->evport < 0 || xc_evtchn_notify(evfd, ctrl->evport))
+	if (ctrl->evport < 0 || xc_evtchn_notify(evfd, ctrl->evport)) {
         xc_evtchn_close(evfd);
-	else
-		ret = 0;
+        goto fail2;
+	}
+
+	ret = 0;
+	goto cleanup;
+
+fail2:
+	switch (version) {
+	case 1:
+		munmap(ctrl->ring, 4096);
+		break;
+	case 2:
+		xc_gnttab_munmap(xcg, ctrl->ring, 1);
+		break;
+	}
+
 fail:
+cleanup:
+#ifdef XENCTRL_HAS_XC_INTERFACE
+	if (xcg)
+#else
+	if (xcg >= 0)
+#endif
+		xc_gnttab_close(xcg);
 	xs_daemon_close(xs);
 	return ret;
 }
