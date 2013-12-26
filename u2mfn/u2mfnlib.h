@@ -26,3 +26,4 @@ int u2mfn_get_last_mfn(int *mfn) ;
 int u2mfn_get_last_mfn_with_fd(int fd, int *mfn) ;
 char *u2mfn_alloc_kpage(void);
 char *u2mfn_alloc_kpage_with_fd(int fd);
+int u2mfn_free_kpage(char *ptr);

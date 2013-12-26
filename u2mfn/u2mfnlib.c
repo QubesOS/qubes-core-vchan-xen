@@ -89,3 +89,9 @@ char *u2mfn_alloc_kpage(void)
 		return MAP_FAILED;
 	return u2mfn_alloc_kpage_with_fd(u2mfn_fd);
 }
+
+int u2mfn_free_kpage(char *ptr)
+{
+	return munmap(ptr, 4096);
+}
+
