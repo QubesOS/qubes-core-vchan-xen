@@ -58,7 +58,7 @@ struct vchan_interface {
 /// struct libvchan is a control structure, passed to all library calls
 struct libvchan {
 	struct vchan_interface *ring;
-	uint32_t ring_ref;
+	grant_ref_t ring_ref;
 	/// descriptor to event channel interface
 #ifdef XENCTRL_HAS_XC_INTERFACE
 	xc_evtchn *evfd;

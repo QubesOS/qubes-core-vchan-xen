@@ -60,7 +60,7 @@
 #define GLOBAL_MAX_SHARED_PAGES 1024
 
 
-static int fill_ctrl(struct libvchan *ctrl, struct vchan_interface *ring, int ring_ref)
+static int fill_ctrl(struct libvchan *ctrl, struct vchan_interface *ring, grant_ref_t ring_ref)
 {
 	if (!ctrl || !ring)
 		return -1;
