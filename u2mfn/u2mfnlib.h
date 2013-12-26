@@ -19,7 +19,7 @@
  *
  */
 
-int u2mfn_get_fd();
+int u2mfn_get_fd(void);
 int u2mfn_get_mfn_for_page(long va, int *mfn) ;
 int u2mfn_get_mfn_for_page_with_fd(int fd, long va, int *mfn) ;
 int u2mfn_get_last_mfn(int *mfn) ;

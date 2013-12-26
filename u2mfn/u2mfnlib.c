@@ -34,7 +34,7 @@ int u2mfn_get_fd()
 	return open("/proc/u2mfn", O_RDWR);
 }
 
-static int get_fd()
+static int get_fd(void)
 {
 	if (u2mfn_fd == -1)
 		u2mfn_fd = u2mfn_get_fd();
@@ -83,7 +83,7 @@ char *u2mfn_alloc_kpage_with_fd(int fd)
 	return ret;
 }
 
-char *u2mfn_alloc_kpage()
+char *u2mfn_alloc_kpage(void)
 {
 	if (get_fd())
 		return MAP_FAILED;
