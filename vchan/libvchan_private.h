@@ -31,7 +31,7 @@
 
 struct libvchan {
     struct libxenvchan *xenvchan;
-    /* store path, which should be removed on vchan close (server only) */
+    /* store path, which should be removed after client connect (server only) */
     char *xs_path;
 };
 

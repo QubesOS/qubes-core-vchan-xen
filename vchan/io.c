@@ -45,7 +45,24 @@ int libvchan_recv(libvchan_t *ctrl, void *data, size_t size) {
 }
 
 int libvchan_wait(libvchan_t *ctrl) {
-    return libxenvchan_wait(ctrl->xenvchan);
+    int ret;
+    struct xs_handle *xs;
+
+    ret = libxenvchan_wait(ctrl->xenvchan);
+    if (ctrl->xs_path) {
+        /* remove xenstore entry at first client connection */
+        xs = xs_open(0);
+        if (xs) {
+            /* if xenstore connection failed just do not remove entries, but do
+             * not abort whole function, especially still free the memory
+             */
+            xs_rm(xs, 0, ctrl->xs_path);
+            xs_close(xs);
+        }
+        free(ctrl->xs_path);
+        ctrl->xs_path = NULL;
+    }
+    return ret;
 }
 
 void libvchan_close(libvchan_t *ctrl) {
@@ -53,7 +70,7 @@ void libvchan_close(libvchan_t *ctrl) {
 
     libxenvchan_close(ctrl->xenvchan);
     if (ctrl->xs_path) {
-        /* remove xenstore entry */
+        /* remove xenstore entry in case of no client connected */
         xs = xs_open(0);
         if (xs) {
             /* if xenstore connection failed just do not remove entries, but do
