@@ -34,7 +34,11 @@
 */
 int libvchan_data_ready(struct libvchan *ctrl)
 {
-	return *ctrl->rd_prod - *ctrl->rd_cons;
+	int data_ready = *ctrl->rd_prod - *ctrl->rd_cons;
+	if (data_ready < 0 || data_ready > ctrl->rd_ring_size)
+		return -1;
+	else
+		return data_ready;
 }
 
 /**
@@ -42,7 +46,11 @@ int libvchan_data_ready(struct libvchan *ctrl)
 */
 int libvchan_buffer_space(struct libvchan *ctrl)
 {
-	return ctrl->wr_ring_size - (*ctrl->wr_prod - *ctrl->wr_cons);
+	int buffer_space = ctrl->wr_ring_size - (*ctrl->wr_prod - *ctrl->wr_cons);
+	if (buffer_space < 0 || buffer_space > ctrl->wr_ring_size)
+		return -1;
+	else
+		return buffer_space;
 }
 
 static int do_notify(struct libvchan *ctrl)
@@ -129,13 +137,15 @@ int libvchan_wait(struct libvchan *ctrl)
         may write less data than requested;
         returns the amount of data processed, -1 on error or peer close
 */        
-int libvchan_write(struct libvchan *ctrl, const char *data, int size)
+int libvchan_write(struct libvchan *ctrl, const char *data, size_t size)
 {
 	int avail, avail_contig;
 	int real_idx;
 	while ((avail = libvchan_buffer_space(ctrl)) == 0)
 		if (libvchan_wait(ctrl) < 0)
 			return -1;
+	if (avail < 0)
+		return -1;
 	if (avail > size)
 		avail = size;
 	real_idx = (*ctrl->wr_prod) & (ctrl->wr_ring_size - 1);
@@ -154,13 +164,15 @@ int libvchan_write(struct libvchan *ctrl, const char *data, int size)
         may return less data than requested;
         returns the amount of data processed, -1 on error or peer close
 */        
-int libvchan_read(struct libvchan *ctrl, char *data, int size)
+int libvchan_read(struct libvchan *ctrl, char *data, size_t size)
 {
 	int avail, avail_contig;
 	int real_idx;
 	while ((avail = libvchan_data_ready(ctrl)) == 0)
 		if (libvchan_wait(ctrl) < 0)
 			return -1;
+	if (avail < 0)
+		return -1;
 	if (avail > size)
 		avail = size;
 	real_idx = (*ctrl->rd_cons) & (ctrl->rd_ring_size - 1);

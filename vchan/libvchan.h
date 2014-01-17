@@ -85,8 +85,8 @@ struct libvchan *libvchan_server_init(int devno);
 struct libvchan *libvchan_client_init(int domain, int devno);
 
 int libvchan_server_handle_connected(struct libvchan *ctrl);
-int libvchan_write(struct libvchan *ctrl, const char *data, int size);
-int libvchan_read(struct libvchan *ctrl, char *data, int size);
+int libvchan_write(struct libvchan *ctrl, const char *data, size_t size);
+int libvchan_read(struct libvchan *ctrl, char *data, size_t size);
 int libvchan_wait(struct libvchan *ctrl);
 int libvchan_close(struct libvchan *ctrl);
 void libvchan_prepare_to_select(struct libvchan *ctrl);
