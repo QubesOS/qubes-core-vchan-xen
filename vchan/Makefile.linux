@@ -20,15 +20,11 @@
 #
 
 CC=gcc
-CFLAGS=-g -Wall -I../u2mfn
+CFLAGS=-g -Wall -Wextra -fPIC
 all: libvchan.so
 
 libvchan.so : init.o io.o
 	gcc -shared -o libvchan.so init.o io.o -L ../u2mfn -lu2mfn
-init.o: init.c
-	gcc -fPIC -Wall -g -c init.c
-io.o: io.c
-	gcc -fPIC -Wall -g -c io.c
 node:	node.o libvchan.so
 	gcc -g -o node node.o -L. -lvchan -lxenctrl -lxenstore
 node-select:	node-select.o libvchan.so
