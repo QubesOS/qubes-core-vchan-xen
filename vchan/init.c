@@ -116,7 +116,9 @@ static int ring_init(struct libvchan *ctrl)
 	int u2mfn_fd;
 	struct vchan_interface *ring;
 #ifdef CONFIG_STUBDOM
-	if (posix_memalign(&ring, XC_PAGE_SIZE, sizeof(*ring)) || !ring)
+	ring = (struct vchan_interface *) memalign(XC_PAGE_SIZE, sizeof(*ring));
+
+	if (!ring)
 		return -1;
 
 
