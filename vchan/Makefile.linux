@@ -20,7 +20,7 @@
 #
 
 CC=gcc
-CFLAGS=-g -Wall -Wextra -fPIC
+CFLAGS=-g -Wall -Wextra -Werror -fPIC
 all: libvchan.so
 
 libvchan.so : init.o io.o

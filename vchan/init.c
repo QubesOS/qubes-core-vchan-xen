@@ -113,7 +113,9 @@ static void ring_cleanup(struct libvchan *ctrl)
 static int ring_init(struct libvchan *ctrl)
 {
 	int mfn;
+#ifndef CONFIG_STUBDOM
 	int u2mfn_fd;
+#endif
 	struct vchan_interface *ring;
 #ifdef CONFIG_STUBDOM
 	ring = (struct vchan_interface *) memalign(XC_PAGE_SIZE, sizeof(*ring));

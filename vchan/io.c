@@ -146,7 +146,7 @@ int libvchan_write(struct libvchan *ctrl, const char *data, size_t size)
 			return -1;
 	if (avail < 0)
 		return -1;
-	if (avail > size)
+	if ((size_t)avail > size)
 		avail = size;
 	real_idx = (*ctrl->wr_prod) & (ctrl->wr_ring_size - 1);
 	avail_contig = ctrl->wr_ring_size - real_idx;
@@ -173,7 +173,7 @@ int libvchan_read(struct libvchan *ctrl, char *data, size_t size)
 			return -1;
 	if (avail < 0)
 		return -1;
-	if (avail > size)
+	if ((size_t)avail > size)
 		avail = size;
 	real_idx = (*ctrl->rd_cons) & (ctrl->rd_ring_size - 1);
 	avail_contig = ctrl->rd_ring_size - real_idx;
