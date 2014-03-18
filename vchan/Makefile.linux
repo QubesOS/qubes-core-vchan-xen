@@ -24,11 +24,11 @@ CFLAGS=-g -Wall -Wextra -Werror -fPIC
 all: libvchan.so
 
 libvchan.so : init.o io.o
-	gcc -shared -o libvchan.so init.o io.o -L ../u2mfn -lu2mfn
+	gcc -shared -o libvchan.so -lxenctrl -lxenstore init.o io.o -L ../u2mfn -lu2mfn
 node:	node.o libvchan.so
-	gcc -g -o node node.o -L. -lvchan -lxenctrl -lxenstore
+	gcc -g -o node node.o -L. -lvchan
 node-select:	node-select.o libvchan.so
-	gcc -g -o node-select node-select.o -L. -lvchan -lxenctrl -lxenstore
+	gcc -g -o node-select node-select.o -L. -lvchan
 clean:
 	rm -f *.o *so *~ client server node node-select
 	
