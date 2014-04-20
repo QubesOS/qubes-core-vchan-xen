@@ -54,6 +54,17 @@ update-repo-template:
 		ln -f $(RPMS_DIR)/x86_64/qubes-libvchan-$(VERSION)*$$dist*.rpm $$vmrepo/rpm/;\
 	done
 
+all:
+	$(MAKE) -C u2mfn
+	$(MAKE) -C vchan -f Makefile.linux
+
+install:
+	install -D -m 0644 vchan/libvchan.h ${DESTDIR}/usr/include/libvchan.h
+	install -D -m 0644 u2mfn/u2mfnlib.h ${DESTDIR}/usr/include/u2mfnlib.h
+	install -D -m 0644 u2mfn/u2mfn-kernel.h ${DESTDIR}/usr/include/u2mfn-kernel.h
+	install -D -m 0644 u2mfn/libu2mfn.so ${DESTDIR}/usr/lib/libu2mfn.so
+	install -D -m 0644 vchan/libvchan.so ${DESTDIR}/usr/lib/libvchan.so
+
 clean:
 	make -C u2mfn clean
 	make -C vchan -f Makefile.linux clean

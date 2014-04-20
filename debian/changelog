@@ -1,0 +1,5 @@
+qubes-core-vchan-xen (2.2.7) jessie; urgency=low
+
+  * Initial Release.
+
+ -- Davíð Steinn Geirsson <david@dsg.is>  Sun, 20 Apr 2014 19:18:18 +0000

@@ -1,0 +1,16 @@
+Source: qubes-core-vchan-xen
+Section: admin
+Priority: extra
+Maintainer: Davíð Steinn Geirsson <david@dsg.is>
+Build-Depends: debhelper, quilt, libxen-dev
+Standards-Version: 3.9.3
+Homepage: http://www.qubes-os.org
+#Vcs-Git: git://git.debian.org/collab-maint/qubes-core-vchan-xen.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/qubes-core-vchan-xen.git;a=summary
+
+Package: qubes-core-vchan-xen
+Architecture: any
+Depends: libxenstore3.0, libxen-4.1 | libxen-4.3, ${shlibs:Depends}, ${misc:Depends}
+Description: Qubes Xen core libraries
+ This package includes the libraries required for the higher-level Qubes
+ daemons and tools.
