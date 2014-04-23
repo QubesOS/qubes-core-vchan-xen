@@ -52,7 +52,7 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
 libvchan_t *libvchan_client_init(int domain, int port);
 
 int libvchan_write(libvchan_t *ctrl, const void *data, size_t size);
-int libvchan_send(libvchan_t *ctrl, void *data, size_t size);
+int libvchan_send(libvchan_t *ctrl, const void *data, size_t size);
 int libvchan_read(libvchan_t *ctrl, void *data, size_t size);
 int libvchan_recv(libvchan_t *ctrl, void *data, size_t size);
 int libvchan_wait(libvchan_t *ctrl);

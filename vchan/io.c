@@ -32,7 +32,7 @@ int libvchan_write(libvchan_t *ctrl, const void *data, size_t size) {
     return libxenvchan_write(ctrl->xenvchan, (char*)data, size);
 }
 
-int libvchan_send(libvchan_t *ctrl, void *data, size_t size) {
+int libvchan_send(libvchan_t *ctrl, const void *data, size_t size) {
     return libxenvchan_send(ctrl->xenvchan, (char*)data, size);
 }
 
