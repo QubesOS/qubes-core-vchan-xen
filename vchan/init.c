@@ -63,12 +63,13 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
 
 libvchan_t *libvchan_client_init(int domain, int port) {
     char xs_path[255];
+    char xs_path_dom[255];
     char xs_path_watch[255];
     libvchan_t *ctrl;
     struct xs_handle *xs;
     char **vec;
     unsigned int count, len;
-    char *dummy;
+    char *dummy, *dummy2;
     char *own_domid;
 
     if (!xc_handle) {
@@ -104,6 +105,8 @@ libvchan_t *libvchan_client_init(int domain, int port) {
                 return NULL;
             }
 
+            snprintf(xs_path_dom, sizeof(xs_path_dom), "/local/domain/%d",
+                    domain);
             snprintf(xs_path, sizeof(xs_path), "/local/domain/%d/data/vchan/%s/%d",
                     domain, own_domid, port);
             /* watch on this key as we might not have access to whole directory */
@@ -126,8 +129,23 @@ libvchan_t *libvchan_client_init(int domain, int port) {
             free(vec);
         }
         dummy = xs_read(xs, 0, xs_path_watch, &len);
-    } while (!dummy);
-    free(dummy);
+        if (dummy)
+            free(dummy);
+        else {
+            if (own_domid && strcmp(own_domid, "0")==0) {
+                /* check if domain still alive */
+                dummy2 = xs_read(xs, 0, xs_path_dom, &len);
+                if (!dummy2) {
+                    fprintf(stderr, "domain dead\n");
+                    xs_close(xs);
+                    return NULL;
+                }
+                free(dummy2);
+            } else {
+                /* FIXME: find a way to check if remote domain is still alive from domU */
+            }
+        }
+    } while (!dummy || !len);
     free(own_domid);
     xs_close(xs);
 
