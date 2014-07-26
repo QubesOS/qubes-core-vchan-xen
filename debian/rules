@@ -4,7 +4,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-export DESTDIR=$(shell pwd)/debian/qubes-core-vchan-xen
+export DESTDIR=$(shell pwd)/debian/libvchan-xen
 
 %:
 	dh $@ 
@@ -14,4 +14,6 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	make install
+	mkdir -p debian/libvchan-xen-dev/usr/include
+	mv $(DESTDIR)/usr/include/*.h debian/libvchan-xen-dev/usr/include/
 

@@ -1,4 +1,4 @@
-qubes-core-vchan-xen (2.2.7) jessie; urgency=low
+libvchan-xen (2.2.7) jessie; urgency=low
 
   * Initial Release.
 
