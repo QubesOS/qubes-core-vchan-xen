@@ -19,4 +19,5 @@ Description: Qubes Xen core libraries
 Package: libvchan-xen-dev
 Architecture: any
 Conflicts: qubes-core-vchan-xen
+Depends: libvchan-xen
 Description: Developement files for Qubes libvchan communication library.
