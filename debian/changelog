@@ -1,3 +1,27 @@
+libvchan-xen (3.0.0) jessie; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: fix deps for jessie build
+
+  [ Marek Marczykowski ]
+  * New vchan API - make it based on libxenvchan (upstreamed version of
+    vchan)
+  * Rename library to libvchan-xen, update rpm headers
+  * Remove libvchan_get_domain_name
+  * restore slow check in libvchan_is_open
+  * gitignore update
+  * client: notify the server when connected
+  * init/client: properly get own domain ID
+  * Fix minor memleak.
+  * Remove vchan connection data from xenstore on vchan close
+  * client: Rebuild xs_path when own domid changed
+
+  [ Marek Marczykowski-Górecki ]
+  * remove xenstore entries just after establishing connection
+  * Add missing 'const'
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 22 Nov 2014 16:24:06 +0100
+
 libvchan-xen (2.2.8) jessie; urgency=medium
 
   [ Davíð Steinn Geirsson ]
