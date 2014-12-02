@@ -1,3 +1,9 @@
+libvchan-xen (2.2.9) jessie; urgency=medium
+
+  * debian: fix deps for jessie build
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 02 Dec 2014 01:09:40 +0100
+
 libvchan-xen (2.2.8) jessie; urgency=medium
 
   [ Davíð Steinn Geirsson ]
