@@ -24,7 +24,7 @@ CFLAGS=-g -Wall -Wextra -Werror -fPIC -O2
 all: libvchan.so
 
 libvchan.so : init.o io.o
-	gcc -shared -o libvchan.so -lxenctrl -lxenstore init.o io.o -L ../u2mfn -lu2mfn
+	gcc -shared -o libvchan.so init.o io.o -L ../u2mfn -lu2mfn -lxenctrl -lxenstore 
 node:	node.o libvchan.so
 	gcc -g -o node node.o -L. -lvchan
 node-select:	node-select.o libvchan.so
