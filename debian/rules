@@ -4,16 +4,14 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-export DESTDIR=$(shell pwd)/debian/libvchan-xen
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+
+export DESTDIR=$(shell pwd)/debian/tmp
 
 %:
-	dh $@ 
+	dh $@ --with autotools-dev
 
 override_dh_auto_build:
-	make all
-
-override_dh_auto_install:
-	make install
-	mkdir -p debian/libvchan-xen-dev/usr/include
-	mv $(DESTDIR)/usr/include/*.h debian/libvchan-xen-dev/usr/include/
-
+	(cd u2mfn; make)
+	(cd vchan; make -f Makefile.linux)

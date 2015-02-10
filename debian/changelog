@@ -1,4 +1,4 @@
-libvchan-xen (3.0.0) jessie; urgency=medium
+libvchan-xen (3.0.0-1) jessie; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
   * debian: fix deps for jessie build
