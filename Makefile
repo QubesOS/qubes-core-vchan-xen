@@ -58,10 +58,6 @@ all:
 	$(MAKE) -C u2mfn
 	$(MAKE) -C vchan -f Makefile.linux
 
-# Create a quilt orig package so we can build xen in Debian
-dist: 	
-	tar cvfz "../libvchan-xen_$(VERSION).orig.tar.gz" --exclude-vcs --exclude=debian .
-
 install:
 	install -D -m 0644 vchan/libvchan.h ${DESTDIR}/usr/include/vchan-xen/libvchan.h
 	install -D -m 0644 u2mfn/u2mfnlib.h ${DESTDIR}/usr/include/u2mfnlib.h
