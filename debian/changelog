@@ -1,3 +1,11 @@
+libvchan-xen (2.2.10) wheezy; urgency=medium
+
+  [ Jason Mehring ]
+  * vchan: Fix compile flags order (-lxenctrl -lxenstore moved to the
+    end)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 05 Mar 2015 03:41:11 +0100
+
 libvchan-xen (2.2.9) jessie; urgency=medium
 
   * debian: fix deps for jessie build
