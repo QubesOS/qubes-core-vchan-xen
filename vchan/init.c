@@ -104,6 +104,12 @@ libvchan_t *libvchan_client_init(int domain, int port) {
                 xs_close(xs);
                 return NULL;
             }
+            if (atoi(own_domid) == domain) {
+                fprintf(stderr, "Loopback vchan connection not supported\n");
+                free(own_domid);
+                xs_close(xs);
+                return NULL;
+            }
 
             snprintf(xs_path_dom, sizeof(xs_path_dom), "/local/domain/%d",
                     domain);
@@ -114,6 +120,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
 
             if (!xs_watch(xs, xs_path_watch, xs_path_watch)) {
                 fprintf(stderr, "Cannot setup watch on %s\n", xs_path_watch);
+                free(own_domid);
                 xs_close(xs);
                 return NULL;
             }
