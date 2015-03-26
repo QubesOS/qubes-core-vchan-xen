@@ -1,3 +1,18 @@
+libvchan-xen (3.0.1-1) wheezy; urgency=medium
+
+  [ Jason Mehring ]
+  * debian: Converted Debian packaging to quilt to allow patches
+  * debian: Refactor Debian quilt packaging
+  * debian: Modified copy-in for patches not to fail if no patch script
+    exists to allow removing patches in future
+  * debian: Revert back to using libxen-dev and libxen as depends
+  * debian:  Add extend-diff-ignore options to debian packager
+
+  [ Marek Marczykowski-Górecki ]
+  * Prevent loopback connections, which currently crashes the kernel
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 27 Mar 2015 00:28:10 +0100
+
 libvchan-xen (3.0.0-1) jessie; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
