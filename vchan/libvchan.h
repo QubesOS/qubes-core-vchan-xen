@@ -44,6 +44,14 @@ typedef int EVTCHN;
 
 #include <libxenvchan.h>
 
+/* return values from libvchan_is_open */
+/* remote disconnected or remote domain dead */
+#define VCHAN_DISCONNECTED 0
+/* connected */
+#define VCHAN_CONNECTED 1
+/* vchan server initialized, waiting for client to connect */
+#define VCHAN_WAITING 2
+
 struct libvchan;
 typedef struct libvchan libvchan_t;
 

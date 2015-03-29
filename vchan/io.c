@@ -101,20 +101,24 @@ int libvchan_is_open(libvchan_t *ctrl) {
     int ret;
     struct evtchn_status evst;
 
-    ret =  libxenvchan_is_open(ctrl->xenvchan);
+    ret = libxenvchan_is_open(ctrl->xenvchan);
+    if (ret == 2) {
+        /* TODO: check if remote domain still alive */
+        return VCHAN_WAITING;
+    }
     if (!ret)
-        return ret;
+        return VCHAN_DISCONNECTED;
     /* slow check in case of domain destroy */
     evst.port = ctrl->xenvchan->event_port;
     evst.dom = DOMID_SELF;
     if (xc_evtchn_status(xc_handle, &evst)) {
         perror("xc_evtchn_status");
-        return 0;
+        return VCHAN_DISCONNECTED;
     }
     if (evst.status != EVTCHNSTAT_interdomain) {
         if (!ctrl->xenvchan->is_server)
             ctrl->xenvchan->ring->srv_live = 0;
-        return 0;
+        return VCHAN_DISCONNECTED;
     }
-    return ret;
+    return VCHAN_CONNECTED;
 }
