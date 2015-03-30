@@ -94,6 +94,11 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         xs_close(xs);
         return NULL;
     }
+    if (!xs_watch(xs, "@releaseDomain", "release")) {
+        fprintf(stderr, "Cannot setup xenstore watch\n");
+        xs_close(xs);
+        return NULL;
+    }
     do {
         if (!own_domid) {
             /* construct xenstore path on first iteration and on every domid
