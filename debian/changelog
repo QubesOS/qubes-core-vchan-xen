@@ -1,3 +1,11 @@
+libvchan-xen (3.0.2-1) wheezy; urgency=medium
+
+  * Provide description of libxenvchan_is_open return values
+  * client: watch for remote domain shutdown during client
+    initialization
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 01 Apr 2015 00:10:14 +0200
+
 libvchan-xen (3.0.1-1) wheezy; urgency=medium
 
   [ Jason Mehring ]
