@@ -29,7 +29,6 @@ Release:	1%{dist}
 
 Summary:	Qubes vchan libraries
 License:	GPL v2 only
-Group:		Development/Sources 
 Group:		Qubes
 Vendor:		Invisible Things Lab
 URL:		http://www.qubes-os.org
