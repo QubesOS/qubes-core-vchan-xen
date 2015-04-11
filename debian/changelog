@@ -1,3 +1,9 @@
+libvchan-xen (3.0.3-1) wheezy; urgency=medium
+
+  * rpm: remove duplicated Group: header
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 11 Apr 2015 03:08:10 +0200
+
 libvchan-xen (3.0.2-1) wheezy; urgency=medium
 
   * Provide description of libxenvchan_is_open return values
