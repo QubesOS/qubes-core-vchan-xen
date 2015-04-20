@@ -56,6 +56,7 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
     }
     ctrl->xs_path = strdup(xs_path);
     ctrl->xenvchan->blocking = 1;
+    ctrl->remote_domain = domain;
     return ctrl;
 }
 
@@ -69,7 +70,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     struct xs_handle *xs;
     char **vec;
     unsigned int count, len;
-    char *dummy, *dummy2;
+    char *dummy;
     char *own_domid;
 
     if (!xc_handle) {
@@ -144,17 +145,10 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         if (dummy)
             free(dummy);
         else {
-            if (own_domid && strcmp(own_domid, "0")==0) {
-                /* check if domain still alive */
-                dummy2 = xs_read(xs, 0, xs_path_dom, &len);
-                if (!dummy2) {
-                    fprintf(stderr, "domain dead\n");
-                    xs_close(xs);
-                    return NULL;
-                }
-                free(dummy2);
-            } else {
-                /* FIXME: find a way to check if remote domain is still alive from domU */
+            if (!libvchan__check_domain_alive(domain)) {
+                fprintf(stderr, "domain dead\n");
+                xs_close(xs);
+                return NULL;
             }
         }
     } while (!dummy || !len);
@@ -173,6 +167,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     ctrl->xenvchan->blocking = 1;
     /* notify server */
     xc_evtchn_notify(ctrl->xenvchan->event, ctrl->xenvchan->event_port);
+    ctrl->remote_domain = domain;
     return ctrl;
 }
 

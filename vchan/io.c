@@ -28,6 +28,26 @@
 
 extern xc_interface *xc_handle;
 
+int libvchan__check_domain_alive(int dom) {
+    struct evtchn_status evst;
+    int ret;
+    /* check if domain still alive */
+    evst.dom = dom;
+    /* xc_evtchn_status will return different error depending on
+     * existence of "source" domain:
+     * ESRCH - domain don't exists
+     * EINVAL/EPERM - domain exsts but port is invalid / cannot check
+     * its status
+     */
+    evst.port = -1;
+
+    ret = xc_evtchn_status(xc_handle, &evst);
+    if (ret == -1 && errno == ESRCH) {
+        return 0;
+    }
+    return 1;
+}
+
 int libvchan_write(libvchan_t *ctrl, const void *data, size_t size) {
     return libxenvchan_write(ctrl->xenvchan, (char*)data, size);
 }
@@ -45,9 +65,47 @@ int libvchan_recv(libvchan_t *ctrl, void *data, size_t size) {
 }
 
 int libvchan_wait(libvchan_t *ctrl) {
-    int ret;
+    int ret = -2; /* invalid, so can be distinguished from real
+                     libxenvchan_wait return code */
     struct xs_handle *xs;
 
+    if (ctrl->xenvchan->is_server && libxenvchan_is_open(ctrl->xenvchan) == 2) {
+        /* In case of vchan server waiting for a client, we'll not receive any
+         * notification if the remote domain dies before connecting. Because of
+         * that, check periodically if remote domain is still alive while
+         * waiting for a connection. Actually this doesn't cover all the cases
+         * - if remote domain is still alive, but remote process dies before
+         * connecting, we'll also not receive any notification. But this, in
+         * most cases, can be solved by application using libvchan.
+         *
+         * During normal operation this shouldn't be long - in most cases vchan
+         * client will connect almost instantly. So this sleep(10) loop will
+         * not hurt. Alternativelly it could be implemented with
+         * xs_watch("@releaseDomain"), but such approach will slow down most
+         * common execution path (xs_open+xs_watch even if client connects
+         * right away).
+         */
+        while (ret == -2 && libxenvchan_is_open(ctrl->xenvchan) == 2) {
+            fd_set rd_set;
+            struct timeval tv = { 10, 0 };
+            int vchan_fd = libxenvchan_fd_for_select(ctrl->xenvchan);
+            FD_ZERO(&rd_set);
+            FD_SET(vchan_fd, &rd_set);
+            switch (select(vchan_fd+1, &rd_set, NULL, NULL, &tv)) {
+                case 0:
+                    if (!libvchan__check_domain_alive(ctrl->remote_domain))
+                        return -1;
+                    break;
+                case 1:
+                    /* break the loop */
+                    ret = -1;
+                    break;
+                default:
+                    perror("select");
+                    return -1;
+            }
+        }
+    }
     ret = libxenvchan_wait(ctrl->xenvchan);
     if (ctrl->xs_path) {
         /* remove xenstore entry at first client connection */
@@ -103,7 +161,8 @@ int libvchan_is_open(libvchan_t *ctrl) {
 
     ret = libxenvchan_is_open(ctrl->xenvchan);
     if (ret == 2) {
-        /* TODO: check if remote domain still alive */
+        if (!libvchan__check_domain_alive(ctrl->remote_domain))
+            return VCHAN_DISCONNECTED;
         return VCHAN_WAITING;
     }
     if (!ret)

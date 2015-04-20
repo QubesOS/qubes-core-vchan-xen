@@ -33,6 +33,9 @@ struct libvchan {
     struct libxenvchan *xenvchan;
     /* store path, which should be removed after client connect (server only) */
     char *xs_path;
+    int remote_domain;
 };
+
+int libvchan__check_domain_alive(int dom);
 
 #endif
