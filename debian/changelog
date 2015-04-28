@@ -1,3 +1,9 @@
+libvchan-xen (3.0.4-1) wheezy; urgency=medium
+
+  * Check if remote domain is still alive
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 28 Apr 2015 13:22:00 +0200
+
 libvchan-xen (3.0.3-1) wheezy; urgency=medium
 
   * rpm: remove duplicated Group: header
