@@ -26,23 +26,9 @@
 #include "libvchan.h"
 #include "libvchan_private.h"
 
-/* intentionally use common xc_interface for all libvchan connections, it
- * doesn't hold any connection-specific informations; it is used only in
- * libvchan_is_open
- */
-xc_interface *xc_handle = NULL;
-
 libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t write_min) {
     char xs_path[255];
     libvchan_t *ctrl;
-
-    if (!xc_handle) {
-        xc_handle = xc_interface_open(NULL, NULL, 0);
-        if (!xc_handle) {
-            /* error already logged by xc_interface_open */
-            return NULL;
-        }
-    }
 
     ctrl = malloc(sizeof(*ctrl));
     if (!ctrl)
@@ -57,6 +43,13 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
     ctrl->xs_path = strdup(xs_path);
     ctrl->xenvchan->blocking = 1;
     ctrl->remote_domain = domain;
+    ctrl->xc_handle = xc_interface_open(NULL, NULL, 0);
+    if (!ctrl->xc_handle) {
+        /* error already logged by xc_interface_open */
+        libxenvchan_close(ctrl->xenvchan);
+        free(ctrl);
+        return NULL;
+    }
     return ctrl;
 }
 
@@ -67,25 +60,24 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     char xs_path_dom[255];
     char xs_path_watch[255];
     libvchan_t *ctrl;
+    xc_interface *xc_handle;
     struct xs_handle *xs;
     char **vec;
     unsigned int count, len;
     char *dummy;
     char *own_domid;
 
+    xc_handle = xc_interface_open(NULL, NULL, 0);
     if (!xc_handle) {
-        xc_handle = xc_interface_open(NULL, NULL, 0);
-        if (!xc_handle) {
-            /* error already logged by xc_interface_open */
-            return NULL;
-        }
+        /* error already logged by xc_interface_open */
+        goto err;
     }
 
     /* wait for server to appear */
     xs = xs_open(0);
     if (!xs) {
         perror("xs_open");
-        goto err;
+        goto err_xc;
     }
 
     own_domid = NULL;
@@ -140,7 +132,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         if (dummy)
             free(dummy);
         else {
-            if (!libvchan__check_domain_alive(domain)) {
+            if (!libvchan__check_domain_alive(xc_handle, domain)) {
                 fprintf(stderr, "domain dead\n");
                 goto err_xs;
             }
@@ -162,10 +154,13 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     /* notify server */
     xc_evtchn_notify(ctrl->xenvchan->event, ctrl->xenvchan->event_port);
     ctrl->remote_domain = domain;
+    ctrl->xc_handle = xc_handle;
     return ctrl;
 
 err_xs:
     xs_close(xs);
+err_xc:
+    xc_interface_close(xc_handle);
 err:
     return NULL;
 }

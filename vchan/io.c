@@ -26,9 +26,7 @@
 #include "libvchan.h"
 #include "libvchan_private.h"
 
-extern xc_interface *xc_handle;
-
-int libvchan__check_domain_alive(int dom) {
+int libvchan__check_domain_alive(xc_interface *xc_handle, int dom) {
     struct evtchn_status evst;
     int ret;
     /* check if domain still alive */
@@ -93,7 +91,7 @@ int libvchan_wait(libvchan_t *ctrl) {
             FD_SET(vchan_fd, &rd_set);
             switch (select(vchan_fd+1, &rd_set, NULL, NULL, &tv)) {
                 case 0:
-                    if (!libvchan__check_domain_alive(ctrl->remote_domain))
+                    if (!libvchan__check_domain_alive(ctrl->xc_handle, ctrl->remote_domain))
                         return -1;
                     break;
                 case 1:
@@ -161,7 +159,7 @@ int libvchan_is_open(libvchan_t *ctrl) {
 
     ret = libxenvchan_is_open(ctrl->xenvchan);
     if (ret == 2) {
-        if (!libvchan__check_domain_alive(ctrl->remote_domain))
+        if (!libvchan__check_domain_alive(ctrl->xc_handle, ctrl->remote_domain))
             return VCHAN_DISCONNECTED;
         return VCHAN_WAITING;
     }
@@ -170,7 +168,7 @@ int libvchan_is_open(libvchan_t *ctrl) {
     /* slow check in case of domain destroy */
     evst.port = ctrl->xenvchan->event_port;
     evst.dom = DOMID_SELF;
-    if (xc_evtchn_status(xc_handle, &evst)) {
+    if (xc_evtchn_status(ctrl->xc_handle, &evst)) {
         perror("xc_evtchn_status");
         return VCHAN_DISCONNECTED;
     }
