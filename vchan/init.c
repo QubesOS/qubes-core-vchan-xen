@@ -57,15 +57,14 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
 
 libvchan_t *libvchan_client_init(int domain, int port) {
     char xs_path[255];
-    char xs_path_dom[255];
     char xs_path_watch[255];
     libvchan_t *ctrl;
     xc_interface *xc_handle;
     struct xs_handle *xs;
     char **vec;
     unsigned int count, len;
-    char *dummy;
-    char *own_domid;
+    char *dummy = NULL;
+    char *own_domid = NULL;
 
     xc_handle = xc_interface_open(NULL, NULL, 0);
     if (!xc_handle) {
@@ -80,7 +79,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         goto err_xc;
     }
 
-    own_domid = NULL;
+    len = 0;
 
     if (!xs_watch(xs, "domid", "domid")) {
         fprintf(stderr, "Cannot setup xenstore watch\n");
@@ -90,10 +89,22 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         fprintf(stderr, "Cannot setup xenstore watch\n");
         goto err_xs;
     }
-    do {
+    while (!dummy || !len) {
+        vec = xs_read_watch(xs, &count);
+        if (vec) {
+            if (strcmp(vec[XS_WATCH_TOKEN], "domid") == 0) {
+                /* domid have changed */
+                if (own_domid) {
+                    free(own_domid);
+                    own_domid = NULL;
+                    xs_unwatch(xs, xs_path_watch, xs_path_watch);
+                }
+            }
+            free(vec);
+        }
         if (!own_domid) {
             /* construct xenstore path on first iteration and on every domid
-             * change detected (save+restore case */
+             * change detected (save+restore case) */
             own_domid = xs_read(xs, 0, "domid", &len);
             if (!own_domid) {
                 fprintf(stderr, "Cannot get own domid\n");
@@ -105,11 +116,9 @@ libvchan_t *libvchan_client_init(int domain, int port) {
                 goto err_xs;
             }
 
-            snprintf(xs_path_dom, sizeof(xs_path_dom), "/local/domain/%d",
-                    domain);
             snprintf(xs_path, sizeof(xs_path), "/local/domain/%d/data/vchan/%s/%d",
                     domain, own_domid, port);
-            /* watch on this key as we might not have access to whole directory */
+            /* watch on this key as we might not have access to the whole directory */
             snprintf(xs_path_watch, sizeof(xs_path_watch), "%s/event-channel", xs_path);
 
             if (!xs_watch(xs, xs_path_watch, xs_path_watch)) {
@@ -118,16 +127,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
                 goto err_xs;
             }
         }
-        vec = xs_read_watch(xs, &count);
-        if (vec) {
-            if (strcmp(vec[XS_WATCH_TOKEN], "domid") == 0) {
-                /* domid have changed -> reread it on next iteration */
-                free(own_domid);
-                own_domid = NULL;
-                xs_unwatch(xs, xs_path_watch, xs_path_watch);
-            }
-            free(vec);
-        }
+
         dummy = xs_read(xs, 0, xs_path_watch, &len);
         if (dummy)
             free(dummy);
@@ -137,8 +137,10 @@ libvchan_t *libvchan_client_init(int domain, int port) {
                 goto err_xs;
             }
         }
-    } while (!dummy || !len);
-    free(own_domid);
+    }
+
+    if (own_domid)
+        free(own_domid);
     xs_close(xs);
 
     ctrl = malloc(sizeof(*ctrl));
