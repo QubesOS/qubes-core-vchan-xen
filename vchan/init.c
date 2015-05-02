@@ -85,20 +85,18 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     xs = xs_open(0);
     if (!xs) {
         perror("xs_open");
-        return NULL;
+        goto err;
     }
 
     own_domid = NULL;
 
     if (!xs_watch(xs, "domid", "domid")) {
         fprintf(stderr, "Cannot setup xenstore watch\n");
-        xs_close(xs);
-        return NULL;
+        goto err_xs;
     }
     if (!xs_watch(xs, "@releaseDomain", "release")) {
         fprintf(stderr, "Cannot setup xenstore watch\n");
-        xs_close(xs);
-        return NULL;
+        goto err_xs;
     }
     do {
         if (!own_domid) {
@@ -107,14 +105,12 @@ libvchan_t *libvchan_client_init(int domain, int port) {
             own_domid = xs_read(xs, 0, "domid", &len);
             if (!own_domid) {
                 fprintf(stderr, "Cannot get own domid\n");
-                xs_close(xs);
-                return NULL;
+                goto err_xs;
             }
             if (atoi(own_domid) == domain) {
                 fprintf(stderr, "Loopback vchan connection not supported\n");
                 free(own_domid);
-                xs_close(xs);
-                return NULL;
+                goto err_xs;
             }
 
             snprintf(xs_path_dom, sizeof(xs_path_dom), "/local/domain/%d",
@@ -127,8 +123,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
             if (!xs_watch(xs, xs_path_watch, xs_path_watch)) {
                 fprintf(stderr, "Cannot setup watch on %s\n", xs_path_watch);
                 free(own_domid);
-                xs_close(xs);
-                return NULL;
+                goto err_xs;
             }
         }
         vec = xs_read_watch(xs, &count);
@@ -147,8 +142,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         else {
             if (!libvchan__check_domain_alive(domain)) {
                 fprintf(stderr, "domain dead\n");
-                xs_close(xs);
-                return NULL;
+                goto err_xs;
             }
         }
     } while (!dummy || !len);
@@ -169,6 +163,11 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     xc_evtchn_notify(ctrl->xenvchan->event, ctrl->xenvchan->event_port);
     ctrl->remote_domain = domain;
     return ctrl;
+
+err_xs:
+    xs_close(xs);
+err:
+    return NULL;
 }
 
 #else
