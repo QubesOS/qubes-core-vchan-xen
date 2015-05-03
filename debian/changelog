@@ -1,3 +1,13 @@
+libvchan-xen (3.0.5-1) wheezy; urgency=medium
+
+  * Rearrange error handling in libvchan_client_init, no functional
+    change
+  * Do not use global xc_interface, open separate one for each vchan
+    connection
+  * Simplify watch loop in libvchan_client_init
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 03 May 2015 13:10:28 +0200
+
 libvchan-xen (3.0.4-1) wheezy; urgency=medium
 
   * Check if remote domain is still alive
