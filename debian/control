@@ -19,5 +19,5 @@ Package: libvchan-xen-dev
 Section: libdevel
 Architecture: amd64
 Conflicts: qubes-core-vchan-xen
-Depends: libvchan-xen (= ${binary:Version}), ${misc:Depends}
+Depends: libvchan-xen (= ${binary:Version}), libxen-dev, ${misc:Depends}
 Description: Developement files for Qubes libvchan communication library.
