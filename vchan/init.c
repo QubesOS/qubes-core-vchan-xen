@@ -53,8 +53,6 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
     return ctrl;
 }
 
-#ifndef WINNT
-
 libvchan_t *libvchan_client_init(int domain, int port) {
     char xs_path[255];
     char xs_path_watch[255];
@@ -166,13 +164,3 @@ err_xc:
 err:
     return NULL;
 }
-
-#else
-
-// Client side not implemented on Windows domains yet
-
-libvchan_t *libvchan_client_init(int domain, int port) {
-	return NULL;
-}
-
-#endif

@@ -22,10 +22,25 @@
 #ifndef _LIBVCHAN_H
 #define _LIBVCHAN_H
 
-#include <stdint.h>
-typedef int EVTCHN;
+#include <windows.h>
+#include <xencontrol.h>
+typedef HANDLE EVTCHN;
+#define snprintf _snprintf
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef LIBVCHAN_EXPORTS
+#    define LIBVCHAN_API __declspec(dllexport)
+#else
+#    define LIBVCHAN_API __declspec(dllimport)
+#endif
 
 /* config vchan features */
+#define QREXEC_RING_V2
+#define ASYNC_INIT
+
 #ifdef CONFIG_STUBDOM
 #define ASYNC_INIT
 #endif /* CONFIG_STUBDOM */
@@ -43,20 +58,44 @@ typedef int EVTCHN;
 struct libvchan;
 typedef struct libvchan libvchan_t;
 
+LIBVCHAN_API
 libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t write_min);
 
+LIBVCHAN_API
 libvchan_t *libvchan_client_init(int domain, int port);
 
+LIBVCHAN_API
 int libvchan_write(libvchan_t *ctrl, const void *data, size_t size);
+
+LIBVCHAN_API
 int libvchan_send(libvchan_t *ctrl, const void *data, size_t size);
+
+LIBVCHAN_API
 int libvchan_read(libvchan_t *ctrl, void *data, size_t size);
+
+LIBVCHAN_API
 int libvchan_recv(libvchan_t *ctrl, void *data, size_t size);
+
+LIBVCHAN_API
 int libvchan_wait(libvchan_t *ctrl);
+
+LIBVCHAN_API
 void libvchan_close(libvchan_t *ctrl);
+
+LIBVCHAN_API
 EVTCHN libvchan_fd_for_select(libvchan_t *ctrl);
+
+LIBVCHAN_API
 int libvchan_is_open(libvchan_t *ctrl);
 
+LIBVCHAN_API
 int libvchan_data_ready(libvchan_t *ctrl);
+
+LIBVCHAN_API
 int libvchan_buffer_space(libvchan_t *ctrl);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _LIBVCHAN_H */
