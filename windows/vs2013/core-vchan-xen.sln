@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvchan", "libvchan\libvchan.vcxproj", "{1A51E646-D153-47FA-A1B3-9AD8E2E95373}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vchan-test", "vchan-test\vchan-test.vcxproj", "{CD5D85B4-2C2B-4000-930D-9AB8C317FC98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -25,6 +27,14 @@ Global
 		{1A51E646-D153-47FA-A1B3-9AD8E2E95373}.Release|x64.ActiveCfg = Release|x64
 		{1A51E646-D153-47FA-A1B3-9AD8E2E95373}.Release|x64.Build.0 = Release|x64
 		{1A51E646-D153-47FA-A1B3-9AD8E2E95373}.Release|x64.Deploy.0 = Release|x64
+		{CD5D85B4-2C2B-4000-930D-9AB8C317FC98}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CD5D85B4-2C2B-4000-930D-9AB8C317FC98}.Debug|Win32.Build.0 = Debug|Win32
+		{CD5D85B4-2C2B-4000-930D-9AB8C317FC98}.Debug|x64.ActiveCfg = Debug|x64
+		{CD5D85B4-2C2B-4000-930D-9AB8C317FC98}.Debug|x64.Build.0 = Debug|x64
+		{CD5D85B4-2C2B-4000-930D-9AB8C317FC98}.Release|Win32.ActiveCfg = Release|Win32
+		{CD5D85B4-2C2B-4000-930D-9AB8C317FC98}.Release|Win32.Build.0 = Release|Win32
+		{CD5D85B4-2C2B-4000-930D-9AB8C317FC98}.Release|x64.ActiveCfg = Release|x64
+		{CD5D85B4-2C2B-4000-930D-9AB8C317FC98}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

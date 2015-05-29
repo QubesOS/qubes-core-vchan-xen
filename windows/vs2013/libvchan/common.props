@@ -18,7 +18,7 @@
     <CustomBuildStep>
       <Command>xcopy /y $(TargetPath) $(SolutionDir)\..\bin\$(PlatformTarget)\
 xcopy /y $(TargetDir)$(TargetName).pdb $(SolutionDir)\..\bin\$(PlatformTarget)\
-xcopy /y $(TargetDir)$(TargetName).lib $(SolutionDir)\..\bin\$(PlatformTarget)\</Command>
+if exist "$(TargetDir)$(TargetName).lib" xcopy /y $(TargetDir)$(TargetName).lib $(SolutionDir)\..\bin\$(PlatformTarget)\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copying output files</Message>
