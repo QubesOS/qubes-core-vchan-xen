@@ -116,8 +116,8 @@ void libvchan_close(libvchan_t *ctrl) {
         /* remove xenstore entry in case of no client connected */
         StoreRemove(ctrl->xc_handle, ctrl->xs_path);
         free(ctrl->xs_path);
-        XenifaceClose(ctrl->xc_handle);
     }
+    XenifaceClose(ctrl->xc_handle);
     free(ctrl);
 }
 
