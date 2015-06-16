@@ -112,6 +112,8 @@ int libvchan_wait(libvchan_t *ctrl) {
 void libvchan_close(libvchan_t *ctrl) {
 
     libxenvchan_close(ctrl->xenvchan);
+    if (!ctrl)
+        return;
     if (ctrl->xs_path) {
         /* remove xenstore entry in case of no client connected */
         StoreRemove(ctrl->xc_handle, ctrl->xs_path);
