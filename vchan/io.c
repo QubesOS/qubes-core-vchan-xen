@@ -99,6 +99,8 @@ int libvchan_wait(libvchan_t *ctrl) {
                     ret = -1;
                     break;
                 default:
+                    if (errno == EINTR)
+                        break;
                     perror("select");
                     return -1;
             }
