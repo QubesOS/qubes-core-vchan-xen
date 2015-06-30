@@ -7,12 +7,12 @@ ifeq ($(PACKAGE_SET),vm)
     SOURCE_COPY_IN := source-debian-quilt-copy-in
   endif
 
-  WIN_SOURCE_SUBDIRS= vchan
+  WIN_COMPILER = msbuild
+  WIN_SOURCE_SUBDIRS = windows
   WIN_BUILD_DEPS = vmm-xen-windows-pvdrivers
-  WIN_SIGN_CMD = true
-  WIN_PACKAGE_CMD = true
-  WIN_OUTPUT_LIBS = libs
-  WIN_OUTPUT_HEADERS = .
+  WIN_OUTPUT_LIBS = bin
+  WIN_OUTPUT_HEADERS = include
+  WIN_PREBUILD_CMD = set_version.bat && powershell -executionpolicy bypass set_version.ps1
 endif
 
 source-debian-quilt-copy-in: VERSION = $(shell cat $(ORIG_SRC)/version)

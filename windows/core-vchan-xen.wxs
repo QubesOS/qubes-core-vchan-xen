@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+
+<?if $(env.DDK_ARCH) = x64 ?>
+    <?define PFILESDIR = ProgramFiles64Folder ?>
+    <?define SYSDIR = System64Folder ?>
+<?else?>
+    <?define PFILESDIR = ProgramFilesFolder ?>
+    <?define SYSDIR = SystemFolder ?>
+<?endif ?>
+
+<Module
+Id='CoreVchan'
+Language='1033'
+Codepage='1252'
+Version='$(env.VERSION)'
+>
+
+<Package
+Id='{2BDF9127-7B0C-4BC7-9320-68EE585DC051}'
+Description='Qubes vchan library'
+Manufacturer='Invisible Things Lab'
+InstallScope='perMachine'
+InstallerVersion='200'
+Languages='1033'
+SummaryCodepage='1252'
+InstallPrivileges='elevated'
+/>
+
+<Directory Id='TARGETDIR' Name='SourceDir'>
+    <Directory Id='$(var.SYSDIR)'>
+        <Component Id='VchanDll' Guid='{A7483192-22F6-47AC-AD77-E5CE3091B879}'>
+            <File Id='libvchan.dll' Source='bin\$(env.DDK_ARCH)\libvchan.dll' KeyPath='yes' />
+        </Component>
+    </Directory>
+</Directory>
+
+</Module>
+</Wix>

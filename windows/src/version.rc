@@ -1,0 +1,39 @@
+#include <windows.h>
+#ifdef RC_INVOKED
+
+// version.h is generated during build by set_version.ps1
+// it contains definition of QTW_* macros
+#include "..\version.h"
+
+#if defined(DBG) || defined(DEBUG) || defined(_DEBUG)
+#define VER_DBG VS_FF_DEBUG
+#else
+#define VER_DBG 0
+#endif
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION QTW_FILEVERSION
+PRODUCTVERSION QTW_PRODUCTVERSION
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+FILEFLAGS VER_DBG
+FILEOS VOS_NT
+FILETYPE VFT_APP
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "000004B0" // LANG_NEUTRAL/SUBLANG_NEUTRAL, Unicode CP
+    BEGIN
+      VALUE "FileVersion", QTW_FILEVERSION_STR
+      VALUE "ProductVersion", QTW_PRODUCTVERSION_STR
+      VALUE "FileDescription", "Qubes vchan library"
+      VALUE "ProductName", "Qubes Tools for Windows"
+      VALUE "CompanyName", "Invisible Things Lab"
+      VALUE "LegalCopyright", "(C) Invisible Things Lab"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0000, 0x04B0
+  END
+END
+#endif

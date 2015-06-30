@@ -19,30 +19,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
+#define LIBVCHAN_EXPORTS
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <xenstore.h>
+#include <xencontrol.h>
 #include "libvchan.h"
 #include "libvchan_private.h"
 
-int libvchan__check_domain_alive(xc_interface *xc_handle, int dom) {
-    struct evtchn_status evst;
-    int ret;
+int libvchan__check_domain_alive(HANDLE xc_handle, int dom) {
+    //DWORD ret, status;
     /* check if domain still alive */
-    evst.dom = dom;
     /* xc_evtchn_status will return different error depending on
      * existence of "source" domain:
      * ESRCH - domain don't exists
      * EINVAL/EPERM - domain exsts but port is invalid / cannot check
      * its status
      */
-    evst.port = -1;
 
-    ret = xc_evtchn_status(xc_handle, &evst);
-    if (ret == -1 && errno == ESRCH) {
-        return 0;
-    }
+    //ret = EvtchnStatus(xc_handle, ~0, &status);
     return 1;
 }
 
@@ -65,8 +60,7 @@ int libvchan_recv(libvchan_t *ctrl, void *data, size_t size) {
 int libvchan_wait(libvchan_t *ctrl) {
     int ret = -2; /* invalid, so can be distinguished from real
                      libxenvchan_wait return code */
-    struct xs_handle *xs;
-
+#if 0
     if (ctrl->xenvchan->is_server && libxenvchan_is_open(ctrl->xenvchan) == 2) {
         /* In case of vchan server waiting for a client, we'll not receive any
          * notification if the remote domain dies before connecting. Because of
@@ -99,24 +93,16 @@ int libvchan_wait(libvchan_t *ctrl) {
                     ret = -1;
                     break;
                 default:
-                    if (errno == EINTR)
-                        break;
                     perror("select");
                     return -1;
             }
         }
     }
+#endif
     ret = libxenvchan_wait(ctrl->xenvchan);
     if (ctrl->xs_path) {
         /* remove xenstore entry at first client connection */
-        xs = xs_open(0);
-        if (xs) {
-            /* if xenstore connection failed just do not remove entries, but do
-             * not abort whole function, especially still free the memory
-             */
-            xs_rm(xs, 0, ctrl->xs_path);
-            xs_close(xs);
-        }
+        StoreRemove(ctrl->xc_handle, ctrl->xs_path);
         free(ctrl->xs_path);
         ctrl->xs_path = NULL;
     }
@@ -124,21 +110,16 @@ int libvchan_wait(libvchan_t *ctrl) {
 }
 
 void libvchan_close(libvchan_t *ctrl) {
-    struct xs_handle *xs;
 
     libxenvchan_close(ctrl->xenvchan);
+    if (!ctrl)
+        return;
     if (ctrl->xs_path) {
         /* remove xenstore entry in case of no client connected */
-        xs = xs_open(0);
-        if (xs) {
-            /* if xenstore connection failed just do not remove entries, but do
-             * not abort whole function, especially still free the memory
-             */
-            xs_rm(xs, 0, ctrl->xs_path);
-            xs_close(xs);
-        }
+        StoreRemove(ctrl->xc_handle, ctrl->xs_path);
         free(ctrl->xs_path);
     }
+    XenifaceClose(ctrl->xc_handle);
     free(ctrl);
 }
 
@@ -156,7 +137,7 @@ int libvchan_buffer_space(libvchan_t *ctrl) {
 
 int libvchan_is_open(libvchan_t *ctrl) {
     int ret;
-    struct evtchn_status evst;
+    //struct evtchn_status evst;
 
     ret = libxenvchan_is_open(ctrl->xenvchan);
     if (ret == 2) {
@@ -164,8 +145,10 @@ int libvchan_is_open(libvchan_t *ctrl) {
             return VCHAN_DISCONNECTED;
         return VCHAN_WAITING;
     }
+    
     if (!ret)
         return VCHAN_DISCONNECTED;
+#if 0
     /* slow check in case of domain destroy */
     evst.port = ctrl->xenvchan->event_port;
     evst.dom = DOMID_SELF;
@@ -178,5 +161,6 @@ int libvchan_is_open(libvchan_t *ctrl) {
             ctrl->xenvchan->ring->srv_live = 0;
         return VCHAN_DISCONNECTED;
     }
+#endif
     return VCHAN_CONNECTED;
 }
