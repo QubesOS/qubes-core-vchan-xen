@@ -1,3 +1,37 @@
+libvchan-xen (3.0.6-1) wheezy; urgency=medium
+
+  [ Wojtek Porczyk ]
+  * spec: -devel Requires: xen-devel
+
+  [ Olivier MEDOC ]
+  * archlinux: Change library name to match QubesR3 name
+
+  [ Wojtek Porczyk ]
+  * debian/control: libvchan-xen-dev Depends: libxen-dev
+
+  [ Marek Marczykowski-Górecki ]
+  * Add test program
+  * Ignore EINTR in libvchan_wait
+
+  [ Rafał Wojdyła ]
+  * windows: update for new pvdrivers
+  * windows: fixed signing
+  * windows: added test program
+  * windows: updated gitignore
+  * windows: moved common property sheet
+  * windos: removed default sign/wix scripts
+  * enabled code analysis on debug build
+  * windows: close xeninterface on client close
+  * windows: allow libvchan_close on null control struct
+  * windows: share more common properties in projects
+  * windows: installer cleanup
+  * windows: prevent installer name collision
+
+  [ Marek Marczykowski-Górecki ]
+  * windows: fix libvchan_close(NULL) handling
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 01 Jul 2015 07:07:18 +0200
+
 libvchan-xen (3.0.5-1) wheezy; urgency=medium
 
   * Rearrange error handling in libvchan_client_init, no functional
