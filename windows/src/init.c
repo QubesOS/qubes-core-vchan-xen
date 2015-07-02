@@ -101,7 +101,9 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     }
 
     StoreRemoveWatch(xc_handle, path_watch_handle);
+    path_watch_handle = NULL;
     CloseHandle(path_watch_event);
+    path_watch_event = NULL;
 
     ctrl = malloc(sizeof(*ctrl));
     if (!ctrl)
