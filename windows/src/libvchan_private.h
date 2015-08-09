@@ -22,21 +22,16 @@
 #ifndef _LIBVCHAN_PRIVATE_H
 #define _LIBVCHAN_PRIVATE_H
 
-#if 0
-/*
- * Do not include it here because this header lack of #ifndef things
- */
-#include <libxenvchan.h>
-#endif
-
 struct libvchan {
     struct libxenvchan *xenvchan;
     /* store path, which should be removed after client connect (server only) */
     char *xs_path;
     int remote_domain;
-    HANDLE xc_handle;
 };
 
 int libvchan__check_domain_alive(HANDLE xc_handle, int dom);
+void _Log(XENIFACE_LOG_LEVEL logLevel, PCHAR function, PWCHAR format, ...);
+
+#define Log(level, msg, ...) _Log(level, __FUNCTION__, L"(%p)" L##msg L"\n", ctrl, __VA_ARGS__)
 
 #endif
