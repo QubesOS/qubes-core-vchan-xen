@@ -24,7 +24,11 @@
 XEN_ROOT = $(CURDIR)/../..
 include $(XEN_ROOT)/tools/Rules.mk
 
-CFLAGS+=-Wall -Wextra -Werror -I$(XEN_ROOT)/tools/libxc -I$(XEN_ROOT)/tools/libvchan -DCONFIG_STUBDOM
+LIBXC_INCLUDES := $(if $(wildcard $(XEN_ROOT)/tools/libxc/include),\
+		$(XEN_ROOT)/tools/libxc/include,\
+		$(XEN_ROOT)/tools/libxc)
+
+CFLAGS+=-Wall -Wextra -Werror -I$(LIBXC_INCLUDES) -I$(XEN_ROOT)/tools/libvchan -DCONFIG_STUBDOM
 all: libvchan.a
 
 libvchan.a: init.o io.o
