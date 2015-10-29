@@ -27,17 +27,18 @@
 #include "libvchan.h"
 #include "libvchan_private.h"
 
-static XenifaceLogger *g_logger = NULL;
+// global state since we want it to work before the control structure is initialized
+static XencontrolLogger *g_logger = NULL;
 
-void libvchan_register_logger(VCHAN_LOGGER *logger) {
+void libvchan_register_logger(libvchan_logger_t *logger)
+{
     if (!logger)
         return;
 
-    g_logger = (XenifaceLogger*)logger;
-    XenifaceRegisterLogger(g_logger);
+    g_logger = (XencontrolLogger*)logger;
 }
 
-void _Log(XENIFACE_LOG_LEVEL logLevel, PCHAR function, PWCHAR format, ...) {
+void _Log(XENCONTROL_LOG_LEVEL logLevel, PCHAR function, PWCHAR format, ...) {
     va_list args;
 
     if (!g_logger)
@@ -75,21 +76,21 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     char xs_path[255];
     char xs_path_watch[255];
     libvchan_t *ctrl = NULL;
-    HANDLE xc_handle = NULL;
+    PXENCONTROL_CONTEXT xc_handle = NULL;
     char own_domid[16];
     DWORD status;
     HANDLE path_watch_event = NULL;
-    PVOID path_watch_handle = NULL;
+    PVOID path_watch_handle = 0;
 
-    if (ERROR_SUCCESS != XenifaceOpen(&xc_handle)) {
-        Log(XLL_ERROR, "XenifaceOpen failed");
+    if (ERROR_SUCCESS != XcOpen(g_logger, &xc_handle)) {
+        Log(XLL_ERROR, "opening xen device failed");
         goto fail;
     }
 
     /* wait for server to appear */
-    status = StoreRead(xc_handle, "domid", sizeof(own_domid), own_domid);
+    status = XcStoreRead(xc_handle, "domid", sizeof(own_domid), own_domid);
     if (status != ERROR_SUCCESS) {
-        Log(XLL_ERROR, "StoreRead(\"domid\") failed: 0x%x", status);
+        Log(XLL_ERROR, "reading domid from xenstore failed: 0x%x", status);
         goto fail;
     }
     
@@ -109,9 +110,9 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     snprintf(xs_path_watch, sizeof(xs_path_watch), "%s/event-channel", xs_path);
 
     Log(XLL_DEBUG, "path: %S", xs_path);
-    status = StoreAddWatch(xc_handle, xs_path_watch, path_watch_event, &path_watch_handle);
+    status = XcStoreAddWatch(xc_handle, xs_path_watch, path_watch_event, &path_watch_handle);
     if (status != ERROR_SUCCESS) {
-        Log(XLL_ERROR, "StoreAddWatch(%S) failed: 0x%x", xs_path_watch, status);
+        Log(XLL_ERROR, "adding xenstore watch (%S) failed: 0x%x", xs_path_watch, status);
         goto fail;
     }
 
@@ -127,8 +128,8 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         Log(XLL_ERROR, "Wait for xenstore (2) failed: 0x%x", GetLastError());
     }
 
-    StoreRemoveWatch(xc_handle, path_watch_handle);
-    path_watch_handle = NULL;
+    XcStoreRemoveWatch(xc_handle, path_watch_handle);
+    path_watch_handle = 0;
     CloseHandle(path_watch_event);
     path_watch_event = NULL;
 
@@ -144,21 +145,21 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     }
     
     ctrl->xenvchan->blocking = 1;
-    /* notify server */
-    EvtchnNotify(xc_handle, ctrl->xenvchan->event_port);
+    // notify server - xc handle must be the one that xenvchan opened since we use event channel that was allocated using that handle
+    XcEvtchnNotify(ctrl->xenvchan->xc, ctrl->xenvchan->event_port);
     ctrl->remote_domain = domain;
-    XenifaceClose(xc_handle);
+    XcClose(xc_handle);
 
     Log(XLL_DEBUG, "ctrl %p, xenvchan %p", ctrl, ctrl->xenvchan);
     return ctrl;
 
 fail:
     if (path_watch_handle)
-        StoreRemoveWatch(xc_handle, path_watch_handle);
+        XcStoreRemoveWatch(xc_handle, path_watch_handle);
     if (path_watch_event)
         CloseHandle(path_watch_event);
     if (xc_handle)
-        XenifaceClose(xc_handle);
+        XcClose(xc_handle);
     if (ctrl)
         free(ctrl);
     return NULL;

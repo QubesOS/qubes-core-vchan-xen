@@ -30,7 +30,7 @@ struct libvchan {
 };
 
 int libvchan__check_domain_alive(HANDLE xc_handle, int dom);
-void _Log(XENIFACE_LOG_LEVEL logLevel, PCHAR function, PWCHAR format, ...);
+void _Log(XENCONTROL_LOG_LEVEL logLevel, PCHAR function, PWCHAR format, ...);
 
 #define Log(level, msg, ...) _Log(level, __FUNCTION__, L"(%p)" L##msg L"\n", ctrl, __VA_ARGS__)
 

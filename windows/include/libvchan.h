@@ -58,10 +58,10 @@ extern "C" {
 struct libvchan;
 typedef struct libvchan libvchan_t;
 
-typedef void VCHAN_LOGGER(IN int logLevel, IN const char *function, IN const WCHAR *format, IN va_list args);
+typedef void libvchan_logger_t(IN int logLevel, IN const char *function, IN const WCHAR *format, IN va_list args);
 
 LIBVCHAN_API
-void libvchan_register_logger(VCHAN_LOGGER *logger);
+void libvchan_register_logger(libvchan_logger_t *logger);
 
 LIBVCHAN_API
 libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t write_min);

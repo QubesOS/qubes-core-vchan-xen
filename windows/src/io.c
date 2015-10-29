@@ -27,7 +27,7 @@
 #include "libvchan.h"
 #include "libvchan_private.h"
 
-int libvchan__check_domain_alive(HANDLE xc_handle, int dom) {
+int libvchan__check_domain_alive(PXENCONTROL_CONTEXT xc_handle, int dom) {
     //DWORD ret, status;
     /* check if domain still alive */
     /* xc_evtchn_status will return different error depending on
@@ -103,7 +103,7 @@ int libvchan_wait(libvchan_t *ctrl) {
     if (ctrl->xs_path) {
         Log(XLL_DEBUG, "client connected, removing xs path %S", ctrl->xs_path);
         /* remove xenstore entry at first client connection */
-        StoreRemove(ctrl->xenvchan->xeniface, ctrl->xs_path);
+        XcStoreRemove(ctrl->xenvchan->xc, ctrl->xs_path);
         free(ctrl->xs_path);
         ctrl->xs_path = NULL;
     }
@@ -118,7 +118,7 @@ void libvchan_close(libvchan_t *ctrl) {
     if (ctrl->xs_path) {
         /* remove xenstore entry in case of no client connected */
         Log(XLL_DEBUG, "removing xs path %S", ctrl->xs_path);
-        StoreRemove(ctrl->xenvchan->xeniface, ctrl->xs_path);
+        XcStoreRemove(ctrl->xenvchan->xc, ctrl->xs_path);
         free(ctrl->xs_path);
     }
 
@@ -144,7 +144,7 @@ int libvchan_is_open(libvchan_t *ctrl) {
 
     ret = libxenvchan_is_open(ctrl->xenvchan);
     if (ret == 2) {
-        if (!libvchan__check_domain_alive(ctrl->xenvchan->xeniface, ctrl->remote_domain))
+        if (!libvchan__check_domain_alive(ctrl->xenvchan->xc, ctrl->remote_domain))
             return VCHAN_DISCONNECTED;
         return VCHAN_WAITING;
     }
