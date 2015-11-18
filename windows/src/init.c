@@ -28,14 +28,14 @@
 #include "libvchan_private.h"
 
 // global state since we want it to work before the control structure is initialized
-static XencontrolLogger *g_logger = NULL;
+static XENCONTROL_LOGGER *g_logger = NULL;
 
 void libvchan_register_logger(libvchan_logger_t *logger)
 {
     if (!logger)
         return;
 
-    g_logger = (XencontrolLogger*)logger;
+    g_logger = (XENCONTROL_LOGGER*)logger;
 }
 
 void _Log(XENCONTROL_LOG_LEVEL logLevel, PCHAR function, PWCHAR format, ...) {
