@@ -33,6 +33,8 @@
 #define Log(msg, ...)
 #endif
 
+#define perror(msg) fprintf(stderr, __FUNCTION__ ": " msg " failed: error 0x%x\n", GetLastError())
+
 int libvchan_write_all(libvchan_t *ctrl, char *buf, int size)
 {
     int written = 0;
