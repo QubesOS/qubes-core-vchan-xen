@@ -63,6 +63,14 @@ typedef void libvchan_logger_t(IN int logLevel, IN const char *function, IN cons
 LIBVCHAN_API
 void libvchan_register_logger(libvchan_logger_t *logger);
 
+/*
+Note: libvchan_*_init sets last error to ERROR_NOT_SUPPORTED if
+the xeniface device is not available. The caller can potentially
+wait for xeniface to become active in that case (this can happen
+after the first reboot after pvdrivers installation, xeniface takes
+a while to load).
+*/
+
 LIBVCHAN_API
 libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t write_min);
 

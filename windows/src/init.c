@@ -62,6 +62,8 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
     if (!ctrl->xenvchan) {
         Log(XLL_ERROR, "libxenvchan_server_init failed");
         free(ctrl);
+        // The above sets last error to ERROR_NOT_SUPPORTED if xeniface
+        // is not loaded, see below for more info.
         return NULL;
     }
 
@@ -80,10 +82,17 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     char own_domid[16];
     DWORD status;
     HANDLE path_watch_event = NULL;
-    PVOID path_watch_handle = 0;
+    PVOID path_watch_handle = NULL;
 
     if (ERROR_SUCCESS != XcOpen(g_logger, &xc_handle)) {
         Log(XLL_ERROR, "opening xen device failed");
+        /*
+        This error signifies that xeniface is not available.
+        We need to return a well-defined code so the caller can potentially
+        wait for xeniface to become active (this can happen after the first
+        reboot after pvdrivers installation, it takes a while to load).
+        */
+        SetLastError(ERROR_NOT_SUPPORTED);
         goto fail;
     }
 
