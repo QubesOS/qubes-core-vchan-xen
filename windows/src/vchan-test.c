@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <strsafe.h>
 #include <xencontrol.h>
 #include "libvchan.h"
 
@@ -31,6 +32,8 @@
 #else
 #define Log(msg, ...)
 #endif
+
+#define perror(msg) fprintf(stderr, __FUNCTION__ ": " msg " failed: error 0x%x\n", GetLastError())
 
 int libvchan_write_all(libvchan_t *ctrl, char *buf, int size)
 {
@@ -144,6 +147,13 @@ void writer(libvchan_t *ctrl)
     }
 }
 
+void XcLogger(int level, const CHAR *function, const WCHAR *format, va_list args)
+{
+    WCHAR buf[1024];
+    StringCbVPrintfW(buf, sizeof(buf), format, args);
+    fprintf(stderr, "[X] %s: %S\n", function, buf);
+}
+
 /**
     Simple libvchan application, both client and server.
     One side does writing, the other side does reading; both from
@@ -165,7 +175,7 @@ int main(int argc, char **argv)
     else
         usage();
 
-    XenifaceSetLogLevel(XLL_DEBUG);
+    libvchan_register_logger(XcLogger);
 
     if (!strcmp(argv[1], "server"))
         ctrl = libvchan_server_init(atoi(argv[3]), atoi(argv[4]), 1024, 1024);
