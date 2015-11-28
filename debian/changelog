@@ -1,3 +1,19 @@
+libvchan-xen (3.1.0-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * studom: fix building with Xen 4.6
+  * Remove redundant link option
+  * debian: do not depend on specific Xen version
+
+  [ Rafał Wojdyła ]
+  * windows: update for pvdriver changes
+  * windows: update logger type
+  * windows: automatic VS project formatting
+  * windows: define meaningful perror() in vchan-test
+  * windows: return ERROR_NOT_SUPPORTED if xeniface is unavailable
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 28 Nov 2015 14:44:50 +0100
+
 libvchan-xen (3.0.8-1) wheezy; urgency=medium
 
   [ Rafał Wojdyła ]
