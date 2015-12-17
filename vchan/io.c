@@ -35,6 +35,7 @@
 int libvchan_data_ready(struct libvchan *ctrl)
 {
 	int data_ready = *ctrl->rd_prod - *ctrl->rd_cons;
+	xen_mb();
 	if (data_ready < 0 || data_ready > ctrl->rd_ring_size)
 		return -1;
 	else
@@ -47,6 +48,7 @@ int libvchan_data_ready(struct libvchan *ctrl)
 int libvchan_buffer_space(struct libvchan *ctrl)
 {
 	int buffer_space = ctrl->wr_ring_size - (*ctrl->wr_prod - *ctrl->wr_cons);
+	xen_mb();
 	if (buffer_space < 0 || buffer_space > ctrl->wr_ring_size)
 		return -1;
 	else
