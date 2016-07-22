@@ -19,10 +19,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
+#define XC_WANT_COMPAT_EVTCHN_API
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <xenstore.h>
+#include <xenctrl.h>
+#include <xenctrl_compat.h>
 #include "libvchan.h"
 #include "libvchan_private.h"
 
