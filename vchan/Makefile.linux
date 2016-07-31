@@ -24,7 +24,7 @@ CFLAGS=-g -Wall -Wextra -Werror -fPIC -O2
 all: libvchan-xen.so vchan-xen.pc
 
 libvchan-xen.so : init.o io.o
-	gcc -shared -o libvchan-xen.so $^ -lxenvchan
+	gcc -shared -o libvchan-xen.so $^ -lxenvchan -lxenctrl
 clean:
 	rm -f *.o *so *~ client server node node-select
 
