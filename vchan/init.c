@@ -25,7 +25,6 @@
 #include <string.h>
 #include <xenstore.h>
 #include <xenctrl.h>
-#include <xenctrl_compat.h>
 #include "libvchan.h"
 #include "libvchan_private.h"
 
