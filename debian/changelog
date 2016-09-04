@@ -1,3 +1,18 @@
+libvchan-xen (3.2.0-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: initial version
+
+  [ WetwareLabs ]
+  * Fix building for Xen 4.7.0
+  * Add libxenctlr dependency
+  * Move libxenctrl dependency to Makefile
+
+  [ Marek Marczykowski-Górecki ]
+  * Allow building with Xen 4.6 and 4.7
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 05 Sep 2016 01:29:39 +0200
+
 libvchan-xen (3.1.0-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
