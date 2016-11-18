@@ -22,12 +22,7 @@
 #ifndef _LIBVCHAN_PRIVATE_H
 #define _LIBVCHAN_PRIVATE_H
 
-#if 0
-/*
- * Do not include it here because this header lack of #ifndef things
- */
 #include <libxenvchan.h>
-#endif
 
 struct libvchan {
     struct libxenvchan *xenvchan;

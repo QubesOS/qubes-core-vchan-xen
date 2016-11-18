@@ -82,7 +82,6 @@ Provides:       qubes-core-libs-devel
 Provides:       qubes-libvchan-devel
 Requires:       %{name} = %{version}-%{release}
 Requires:       pkgconfig
-Requires:       xen-devel
 
 %description devel
 

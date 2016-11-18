@@ -30,8 +30,6 @@ typedef int EVTCHN;
 #define ASYNC_INIT
 #endif /* CONFIG_STUBDOM */
 
-#include <libxenvchan.h>
-
 /* return values from libvchan_is_open */
 /* remote disconnected or remote domain dead */
 #define VCHAN_DISCONNECTED 0
