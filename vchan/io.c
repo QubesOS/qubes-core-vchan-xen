@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <xenstore.h>
 #include <xenctrl.h>
 #include "libvchan.h"
@@ -110,13 +111,41 @@ int libvchan_wait(libvchan_t *ctrl) {
     }
     ret = libxenvchan_wait(ctrl->xenvchan);
     if (ctrl->xs_path) {
+        xs_transaction_t trans;
+        char *xs_dir_path, *last_slash;
+        char **dir_list;
+        unsigned int dir_size;
         /* remove xenstore entry at first client connection */
         xs = xs_open(0);
         if (xs) {
-            /* if xenstore connection failed just do not remove entries, but do
-             * not abort whole function, especially still free the memory
+            /* If xenstore connection failed just do not remove entries, but do
+             * not abort whole function, especially still free the memory.
+             *
+             * If that was the last connection waiting to that domain,
+             * remove the whole directory. Use transaction to avoid race
+             * condition.
              */
-            xs_rm(xs, 0, ctrl->xs_path);
+            xs_dir_path = strdup(ctrl->xs_path);
+            /* cut last directory component */
+            last_slash = strrchr(xs_dir_path, '/');
+            if (last_slash)
+                *last_slash = '\0';
+            do {
+                trans = xs_transaction_start(xs);
+                if (trans == XBT_NULL) {
+                    perror("xs_transaction_start");
+                    break;
+                }
+                xs_rm(xs, trans, ctrl->xs_path);
+                dir_list = xs_directory(xs, trans, xs_dir_path, &dir_size);
+                if (dir_list && dir_size == 0) {
+                    /* that was the last entry, remove the whole directory */
+                    xs_rm(xs, trans, xs_dir_path);
+                }
+                if (dir_list)
+                    free(dir_list);
+            } while (!xs_transaction_end(xs, trans, 0) && errno == EAGAIN);
+            free(xs_dir_path);
             xs_close(xs);
         }
         free(ctrl->xs_path);
