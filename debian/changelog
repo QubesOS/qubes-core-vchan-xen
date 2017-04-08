@@ -1,3 +1,12 @@
+libvchan-xen (3.2.1-1) unstable; urgency=medium
+
+  * Don't require xen-devel when building other packages linked with
+    vchan
+  * travis: drop debootstrap workaround
+  * Cleanup empty xenstore directory after removing connection data
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 08 Apr 2017 13:52:30 +0200
+
 libvchan-xen (3.2.0-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
