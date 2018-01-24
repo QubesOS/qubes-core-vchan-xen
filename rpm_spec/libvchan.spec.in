@@ -21,10 +21,8 @@
 #
 #
 
-%{!?version: %define version %(cat version)}
-
 Name:		qubes-libvchan-xen
-Version:	%{version}
+Version:	@VERSION@
 Release:	1%{dist}
 
 Summary:	Qubes vchan libraries
@@ -36,18 +34,17 @@ Obsoletes:  qubes-core-libs < 2.1.2
 Provides:   qubes-core-libs
 Provides:   qubes-libvchan
 BuildRequires: xen-devel >= 4.2
+Source0:    %{name}-%{version}.tar.gz
 
+%if 0%{?qubes_builder}
 %define _builddir %(pwd)
+%endif
 
 %description
 The Qubes core libraries for installation inside a Qubes Dom0 and VM.
 
 %prep
-# we operate on the current directory, so no need to unpack anything
-# symlink is to generate useful debuginfo packages
-rm -f %{name}-%{version}
-ln -sf . %{name}-%{version}
-%setup -T -D
+%setup -q
 
 %build
 (cd u2mfn; make)
