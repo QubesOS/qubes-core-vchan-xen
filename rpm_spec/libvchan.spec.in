@@ -36,10 +36,6 @@ Provides:   qubes-libvchan
 BuildRequires: xen-devel >= 4.2
 Source0:    %{name}-%{version}.tar.gz
 
-%if 0%{?qubes_builder}
-%define _builddir %(pwd)
-%endif
-
 %description
 The Qubes core libraries for installation inside a Qubes Dom0 and VM.
 
