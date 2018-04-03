@@ -83,3 +83,6 @@ Requires:       pkgconfig
 %{_libdir}/pkgconfig/vchan-xen.pc
 %{_includedir}/u2mfnlib.h
 %{_includedir}/u2mfn-kernel.h
+
+%changelog
+@CHANGELOG@
