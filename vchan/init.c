@@ -119,7 +119,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
             snprintf(xs_path, sizeof(xs_path), "/local/domain/%d/data/vchan/%s/%d",
                     domain, own_domid, port);
             /* watch on this key as we might not have access to the whole directory */
-            snprintf(xs_path_watch, sizeof(xs_path_watch), "%s/event-channel", xs_path);
+            snprintf(xs_path_watch, sizeof(xs_path_watch), "%.128s/event-channel", xs_path);
 
             if (!xs_watch(xs, xs_path_watch, xs_path_watch)) {
                 fprintf(stderr, "Cannot setup watch on %s\n", xs_path_watch);
