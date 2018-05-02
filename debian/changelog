@@ -1,3 +1,19 @@
+libvchan-xen (4.0.2-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Adjust snprintf string limit
+
+  [ Frédéric Pierret ]
+  * Create spec.in and Source0
+  * Remove _builddir
+  * spec.in: add changelog placeholder
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: update for R4.0, bump Fedora versions
+  * travis: add centos7
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 03 May 2018 01:12:58 +0200
+
 libvchan-xen (4.0.1-1) unstable; urgency=medium
 
   [ Ilpo Järvinen ]
