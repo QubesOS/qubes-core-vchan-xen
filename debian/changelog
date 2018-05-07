@@ -1,3 +1,10 @@
+libvchan-xen (3.2.2-1) unstable; urgency=medium
+
+  * Adjust snprintf string limit
+  * travis: update Fedora versions, add CentOS
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 07 May 2018 03:58:01 +0200
+
 libvchan-xen (3.2.1-1) unstable; urgency=medium
 
   * Don't require xen-devel when building other packages linked with
