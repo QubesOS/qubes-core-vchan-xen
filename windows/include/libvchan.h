@@ -23,9 +23,7 @@
 #define _LIBVCHAN_H
 
 #include <windows.h>
-#include <xencontrol.h>
 typedef HANDLE EVTCHN;
-#define snprintf _snprintf
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,8 +42,6 @@ extern "C" {
 #ifdef CONFIG_STUBDOM
 #define ASYNC_INIT
 #endif /* CONFIG_STUBDOM */
-
-#include <libxenvchan.h>
 
 /* return values from libvchan_is_open */
 /* remote disconnected or remote domain dead */

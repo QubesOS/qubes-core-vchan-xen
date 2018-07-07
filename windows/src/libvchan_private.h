@@ -22,6 +22,12 @@
 #ifndef _LIBVCHAN_PRIVATE_H
 #define _LIBVCHAN_PRIVATE_H
 
+#include <libxenvchan.h>
+
+#if _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
+
 struct libvchan {
     struct libxenvchan *xenvchan;
     /* store path, which should be removed after client connect (server only) */
