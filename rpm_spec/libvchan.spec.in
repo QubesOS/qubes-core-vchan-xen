@@ -33,6 +33,7 @@ URL:		http://www.qubes-os.org
 Obsoletes:  qubes-core-libs < 2.1.2
 Provides:   qubes-core-libs
 Provides:   qubes-libvchan
+BuildRequires: gcc
 BuildRequires: xen-devel >= 4.2
 Source0:    %{name}-%{version}.tar.gz
 
