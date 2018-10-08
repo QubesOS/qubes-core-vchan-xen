@@ -1,3 +1,10 @@
+libvchan-xen (4.0.4-1) unstable; urgency=medium
+
+  * rpm: add BR: gcc
+  * travis: update Fedora and Debian versions
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 08 Oct 2018 22:50:37 +0200
+
 libvchan-xen (4.0.3-1) unstable; urgency=medium
 
   * windows: update for vs2017
