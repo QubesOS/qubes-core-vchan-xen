@@ -1,3 +1,9 @@
+libvchan-xen (4.0.5-1) unstable; urgency=medium
+
+  * 
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 09 Oct 2018 20:28:20 +0200
+
 libvchan-xen (4.0.4-1) unstable; urgency=medium
 
   * rpm: add BR: gcc
