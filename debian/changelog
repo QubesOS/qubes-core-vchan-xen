@@ -1,3 +1,11 @@
+libvchan-xen (4.1.0-1) unstable; urgency=medium
+
+  * debian: don't create orig.tar.gz manually
+  * debian: add autotools-dev to build-depends
+  * travis: update to R4.1
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 27 Feb 2019 02:48:47 +0100
+
 libvchan-xen (4.0.5-1) unstable; urgency=medium
 
   * 
