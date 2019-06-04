@@ -38,7 +38,7 @@ void libvchan_register_logger(libvchan_logger_t *logger)
     g_logger = (XENCONTROL_LOGGER*)logger;
 }
 
-void _Log(XENCONTROL_LOG_LEVEL logLevel, PCHAR function, PWCHAR format, ...) {
+void _Log(XENCONTROL_LOG_LEVEL logLevel, LPCSTR function, PWCHAR format, ...) {
     va_list args;
 
     if (!g_logger)
