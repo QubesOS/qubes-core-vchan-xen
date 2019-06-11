@@ -1,19 +1,19 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
-
-<?if $(env.DDK_ARCH) = x64 ?>
+    <?if $(env.DDK_ARCH) = x64 ?>
     <?define SYSDIR = System64Folder ?>
-<?else?>
+    <?else?>
     <?define SYSDIR = SystemFolder ?>
-<?endif ?>
-
-<Fragment>
-
-<DirectoryRef Id='$(var.SYSDIR)'>
-        <Component Id='VchanDll' Guid='{A7483192-22F6-47AC-AD77-E5CE3091B879}'>
-            <File Id='libvchan.dll' Source='$(env.QUBES_BIN)\libvchan.dll' KeyPath='yes' />
-        </Component>
-</DirectoryRef>
-
-</Fragment>
+    <?endif ?>
+    <Fragment>
+        <DirectoryRef Id='$(var.SYSDIR)'>
+            <Component Id='VchanDll'
+                       Guid='{A7483192-22F6-47AC-AD77-E5CE3091B879}'>
+                       
+                <File Id='libvchan.dll'
+                      Source='$(env.QUBES_BIN)\libvchan.dll'
+                      KeyPath='yes' />
+            </Component>
+        </DirectoryRef>
+    </Fragment>
 </Wix>
