@@ -11,7 +11,7 @@
 
 <DirectoryRef Id='$(var.SYSDIR)'>
         <Component Id='VchanDll' Guid='{A7483192-22F6-47AC-AD77-E5CE3091B879}'>
-            <File Id='libvchan.dll' Source='bin\$(env.DDK_ARCH)\libvchan.dll' KeyPath='yes' />
+            <File Id='libvchan.dll' Source='$(env.QUBES_BIN)\libvchan.dll' KeyPath='yes' />
         </Component>
 </DirectoryRef>
 
