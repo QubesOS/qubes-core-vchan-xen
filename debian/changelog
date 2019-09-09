@@ -1,3 +1,15 @@
+libvchan-xen (4.0.6-1) unstable; urgency=medium
+
+  * debian: don't create orig.tar.gz manually
+  * Drop obsolete make targets
+  * Make the makefile more flexible, introduce PREFIX, LIBDIR,
+    INCLUDEDIR
+  * rpm: make use of improved make file
+  * debian: make use of more flexible makefile
+  * travis: add fc30, switch to xenial
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 09 Sep 2019 04:48:45 +0200
+
 libvchan-xen (4.0.5-1) unstable; urgency=medium
 
   * 
