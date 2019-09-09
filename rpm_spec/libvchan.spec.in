@@ -44,7 +44,7 @@ The Qubes core libraries for installation inside a Qubes Dom0 and VM.
 %setup -q
 
 %build
-%set_build_flags
+%{?set_build_flags}
 export LIBDIR=%{_libdir}
 export INCLUDEDIR=%{_includedir}
 make all
