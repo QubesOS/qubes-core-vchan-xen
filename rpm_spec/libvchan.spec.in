@@ -44,17 +44,15 @@ The Qubes core libraries for installation inside a Qubes Dom0 and VM.
 %setup -q
 
 %build
-(cd u2mfn; make)
-(cd vchan; make -f Makefile.linux)
+%set_build_flags
+export LIBDIR=%{_libdir}
+export INCLUDEDIR=%{_includedir}
+make all
 
 %install
-install -D -m 0644 vchan/libvchan.h $RPM_BUILD_ROOT%{_includedir}/vchan-xen/libvchan.h
-install -D -m 0644 u2mfn/u2mfnlib.h $RPM_BUILD_ROOT%{_includedir}/u2mfnlib.h
-install -D -m 0644 u2mfn/u2mfn-kernel.h $RPM_BUILD_ROOT%{_includedir}/u2mfn-kernel.h
-install -D -m 0644 vchan/vchan-xen.pc $RPM_BUILD_ROOT/%{_libdir}/pkgconfig/vchan-xen.pc
-
-install -D vchan/libvchan-xen.so $RPM_BUILD_ROOT/%{_libdir}/libvchan-xen.so
-install -D u2mfn/libu2mfn.so $RPM_BUILD_ROOT/%{_libdir}/libu2mfn.so
+export LIBDIR=%{_libdir}
+export INCLUDEDIR=%{_includedir}
+make DESTDIR=$RPM_BUILD_ROOT install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
