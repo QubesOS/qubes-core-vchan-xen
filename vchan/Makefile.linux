@@ -19,14 +19,21 @@
 #
 #
 
-CC=gcc
-CFLAGS=-g -Wall -Wextra -Werror -fPIC -O2
+PREFIX ?= /usr
+LIBDIR ?= $(PREFIX)/lib
+INCLUDEDIR ?= $(PREFIX)/include
+CC ?= gcc
+CFLAGS += -g -Wall -Wextra -Werror -fPIC -O2
 all: libvchan-xen.so vchan-xen.pc
 
 libvchan-xen.so : init.o io.o
-	gcc -shared -o libvchan-xen.so $^ -lxenvchan -lxenctrl
+	$(CC) $(LDFLAGS) -shared -o libvchan-xen.so $^ -lxenvchan -lxenctrl
 clean:
 	rm -f *.o *so *~ client server node node-select
 
 vchan-xen.pc: vchan-xen.pc.in
-	sed -e "s/@VERSION@/`cat ../version`/" $< > $@
+	sed -e "s/@VERSION@/`cat ../version`/" \
+		-e "s:@PREFIX@:$(PREFIX):" \
+		-e "s:@LIBDIR@:$(LIBDIR):" \
+		-e "s:@INCLUDEDIR@:$(INCLUDEDIR):" \
+		$< > $@
