@@ -1,7 +1,7 @@
-prefix=/usr
+prefix=@PREFIX@
 exec_prefix=${prefix}
-includedir=${prefix}/include
-libdir=${exec_prefix}/lib64
+includedir=@INCLUDEDIR@
+libdir=@LIBDIR@
 
 Name: vchan-xen
 Description: The vchan communication library

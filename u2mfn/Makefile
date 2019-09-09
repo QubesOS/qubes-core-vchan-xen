@@ -19,14 +19,14 @@
 #
 #
 
-CC=gcc
-CFLAGS=-g -Wall
+CC ?= gcc
+CFLAGS += -g -Wall
 all: libu2mfn.so
 
 libu2mfn.so : u2mfnlib.o
-	gcc -shared -o libu2mfn.so u2mfnlib.o
+	$(CC) $(LDFLAGS) -shared -o libu2mfn.so u2mfnlib.o
 u2mfnlib.o: u2mfnlib.c
-	gcc -fPIC -Wall -g -c u2mfnlib.c
+	$(CC) $(CFLAGS) -fPIC -c u2mfnlib.c
 clean:
 	rm -f *.o *so *~ libu2mfn.so
 	
