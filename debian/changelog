@@ -1,3 +1,10 @@
+libvchan-xen (4.0.7-1) unstable; urgency=medium
+
+  * rpm: use %set_build_flags macro only when present
+  * Check if domain is alive using domctl
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 21 Sep 2019 03:53:09 +0200
+
 libvchan-xen (4.0.6-1) unstable; urgency=medium
 
   * debian: don't create orig.tar.gz manually
