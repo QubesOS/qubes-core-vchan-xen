@@ -29,10 +29,21 @@
 #include "libvchan.h"
 #include "libvchan_private.h"
 
+/* check if domain is still alive */
 int libvchan__check_domain_alive(xc_interface *xc_handle, int dom) {
     struct evtchn_status evst;
+    xc_dominfo_t dominfo;
     int ret;
-    /* check if domain still alive */
+
+    /* first try using domctl, more reliable but available in a privileged
+     * domain only */
+    ret = xc_domain_getinfo(xc_handle, dom, 1, &dominfo);
+    if (ret == 1)
+        return dominfo.domid == (uint32_t)dom && !dominfo.dying;
+    else if (ret == -1 && errno == ESRCH)
+        return 0;
+    /* otherwise fallback to xc_evtchn_status method */
+
     evst.dom = dom;
     /* xc_evtchn_status will return different error depending on
      * existence of "source" domain:
