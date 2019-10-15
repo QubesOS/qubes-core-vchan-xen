@@ -1,3 +1,9 @@
+libvchan-xen (4.1.3-1) unstable; urgency=medium
+
+  * Rebuild for CentOS
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 15 Oct 2019 03:05:34 +0200
+
 libvchan-xen (4.1.2-1) unstable; urgency=medium
 
   * travis: switch to xenial
