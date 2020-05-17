@@ -35,9 +35,13 @@ struct libvchan {
     int remote_domain;
 };
 
-int libvchan__check_domain_alive(HANDLE xc_handle, int dom);
-void _Log(XENCONTROL_LOG_LEVEL logLevel, PCHAR function, PWCHAR format, ...);
+int libvchan__check_domain_alive(PXENCONTROL_CONTEXT xc_handle, int dom);
+void _Log(XENCONTROL_LOG_LEVEL logLevel, LPCSTR function, PWCHAR format, ...);
 
+#ifdef __MINGW32__
+#define Log(level, msg, ...) _Log(level, __FUNCTION__, L"(%p)" L##msg L"\n", ctrl, ##__VA_ARGS__)
+#else
 #define Log(level, msg, ...) _Log(level, __FUNCTION__, L"(%p)" L##msg L"\n", ctrl, __VA_ARGS__)
+#endif
 
 #endif
