@@ -1,3 +1,12 @@
+libvchan-xen (4.1.4-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * travis: switch to bionic
+  * travis: switch to dom0 Fedora 31
+  * Update travis
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 31 Aug 2020 04:06:31 +0200
+
 libvchan-xen (4.1.3-1) unstable; urgency=medium
 
   * Rebuild for CentOS
