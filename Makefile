@@ -17,6 +17,7 @@ install:
 	install -D -m 0644 vchan/vchan-xen.pc ${DESTDIR}$(LIBDIR)/pkgconfig/vchan-xen.pc
 	install -D u2mfn/libu2mfn.so ${DESTDIR}$(LIBDIR)/libu2mfn.so
 	install -D vchan/libvchan-xen.so ${DESTDIR}$(LIBDIR)/libvchan-xen.so
+	cd ${DESTDIR}$(LIBDIR)/pkgconfig && ln -s vchan-xen.pc vchan.pc
 
 clean:
 	make -C u2mfn clean

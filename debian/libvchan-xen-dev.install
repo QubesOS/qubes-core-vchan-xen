@@ -2,3 +2,4 @@ usr/include/u2mfn-kernel.h
 usr/include/u2mfnlib.h
 usr/include/vchan-xen/libvchan.h
 usr/lib/pkgconfig/vchan-xen.pc
+usr/lib/pkgconfig/vchan.pc

@@ -69,7 +69,7 @@ Group:          Development/Sources
 Obsoletes:      qubes-core-appvm-devel
 Obsoletes:      qubes-core-vm-devel < 2.1.2
 Obsoletes:      qubes-core-libs-devel < 2.1.2
-Provides:      qubes-core-vm-devel
+Provides:       qubes-core-vm-devel
 Provides:       qubes-core-libs-devel
 Provides:       qubes-libvchan-devel
 Requires:       %{name} = %{version}-%{release}
@@ -80,6 +80,7 @@ Requires:       pkgconfig
 %files devel
 %{_includedir}/vchan-xen/libvchan.h
 %{_libdir}/pkgconfig/vchan-xen.pc
+%{_libdir}/pkgconfig/vchan.pc
 %{_includedir}/u2mfnlib.h
 %{_includedir}/u2mfn-kernel.h
 
