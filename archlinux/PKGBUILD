@@ -5,7 +5,7 @@
 
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-libvchan-xen
-pkgver=`cat version`
+pkgver=$(cat version)
 pkgrel=2
 
 epoch=
@@ -33,25 +33,15 @@ md5sums=() #generate with 'makepkg -g'
 
 
 build() {
+    ln -s "$srcdir"/../vchan "$srcdir/vchan"
+    ln -s "$srcdir"/../u2mfn "$srcdir/u2mfn"
 
-ln -s $srcdir/../vchan $srcdir/vchan
-ln -s $srcdir/../u2mfn $srcdir/u2mfn
-
-(cd u2mfn; make)
-(cd vchan; make -f Makefile.linux)
-
+    (cd u2mfn; make)
+    (cd vchan; make -f Makefile.linux)
 }
 
 package() {
-
-install -D -m 0644 vchan/libvchan.h $pkgdir/usr/include/libvchan.h
-install -D -m 0644 u2mfn/u2mfnlib.h $pkgdir/usr/include/u2mfnlib.h
-install -D -m 0644 u2mfn/u2mfn-kernel.h $pkgdir/usr/include/u2mfn-kernel.h
-install -D -m 0644 vchan/vchan-xen.pc $pkgdir/usr/lib/pkgconfig/vchan-xen.pc
-
-install -D vchan/libvchan-xen.so $pkgdir/usr/lib/libvchan-xen.so
-install -D u2mfn/libu2mfn.so $pkgdir/usr/lib/libu2mfn.so
-
+    make install DESTDIR="$pkgdir" LIBDIR=/usr/lib INCLUDEDIR=/usr/include
 }
 
 # vim:set ts=2 sw=2 et:
