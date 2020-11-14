@@ -11,6 +11,7 @@ Section: libs
 Architecture: amd64
 Depends: libxenstore3.0, ${shlibs:Depends}, ${misc:Depends}
 Conflicts: qubes-core-vchan-xen
+Provides: libvchan
 Description: Qubes Xen core libraries
  This package includes the libraries required for the higher-level Qubes
  daemons and tools.
@@ -20,4 +21,5 @@ Section: libdevel
 Architecture: amd64
 Conflicts: qubes-core-vchan-xen
 Depends: libvchan-xen (= ${binary:Version}), ${misc:Depends}
+Provides: libvchan-dev
 Description: Development files for Qubes libvchan communication library.
