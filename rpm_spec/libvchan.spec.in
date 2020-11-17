@@ -60,7 +60,6 @@ rm -f %{name}-%{version}
 
 %files
 %{_libdir}/libvchan-xen.so
-%{_libdir}/libu2mfn.so
 
 %package devel
 Summary:        Include files for qubes core libraries
@@ -81,8 +80,6 @@ Requires:       pkgconfig
 %{_includedir}/vchan-xen/libvchan.h
 %{_libdir}/pkgconfig/vchan-xen.pc
 %{_libdir}/pkgconfig/vchan.pc
-%{_includedir}/u2mfnlib.h
-%{_includedir}/u2mfn-kernel.h
 
 %changelog
 @CHANGELOG@
