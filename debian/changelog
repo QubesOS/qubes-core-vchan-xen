@@ -1,3 +1,16 @@
+libvchan-xen (4.1.5-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Create symlink to vchan-xen.pc
+  * archlinux: polish PKGBUILD
+  * debian: provide generic libvchan{,-dev} packages
+  * Add .gitlab-ci.yml
+
+  [ Marek Marczykowski-Górecki ]
+  * Remove u2mfn lib
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 19 Nov 2020 00:45:24 +0100
+
 libvchan-xen (4.1.4-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
