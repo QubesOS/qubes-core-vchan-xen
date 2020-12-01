@@ -2,6 +2,7 @@ prefix=@PREFIX@
 exec_prefix=${prefix}
 includedir=@INCLUDEDIR@
 libdir=@LIBDIR@
+backend_vmm=xen
 
 Name: vchan-xen
 Description: The vchan communication library
