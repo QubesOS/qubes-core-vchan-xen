@@ -34,6 +34,7 @@ md5sums=() #generate with 'makepkg -g'
 
 build() {
     ln -s "$srcdir"/../vchan "$srcdir/vchan"
+    ln -s "$srcdir"/../Makefile "$srcdir/Makefile"
 
     (cd vchan; make -f Makefile.linux)
 }
