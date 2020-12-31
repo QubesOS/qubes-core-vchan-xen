@@ -1,3 +1,10 @@
+libvchan-xen (4.1.7-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * archlinux: fix missing symlink in refactor
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 31 Dec 2020 13:30:26 +0100
+
 libvchan-xen (4.1.6-1) unstable; urgency=medium
 
   * Include extra 'backend_vmm' variable in pkgconfig file
