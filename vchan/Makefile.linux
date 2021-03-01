@@ -22,12 +22,16 @@
 PREFIX ?= /usr
 LIBDIR ?= $(PREFIX)/lib
 INCLUDEDIR ?= $(PREFIX)/include
+ROOTDIR := $(patsubst %/vchan,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+
 CC ?= gcc
-CFLAGS += -g -Wall -Wextra -Werror -fPIC -O2
+CFLAGS += -g -Wall -Wextra -Werror -fPIC -O2 -ffile-prefix-map=$(ROOTDIR)=.
+
 all: libvchan-xen.so vchan-xen.pc
 
 libvchan-xen.so : init.o io.o
 	$(CC) $(LDFLAGS) -shared -o libvchan-xen.so $^ -lxenvchan -lxenctrl
+
 clean:
 	rm -f *.o *so *~ client server node node-select
 
