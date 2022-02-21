@@ -38,7 +38,7 @@ void libvchan_register_logger(libvchan_logger_t *logger)
     g_logger = (XENCONTROL_LOGGER*)logger;
 }
 
-void _Log(XENCONTROL_LOG_LEVEL logLevel, PCHAR function, PWCHAR format, ...) {
+void _Log(XENCONTROL_LOG_LEVEL logLevel, LPCSTR function, PWCHAR format, ...) {
     va_list args;
 
     if (!g_logger)
@@ -127,14 +127,14 @@ libvchan_t *libvchan_client_init(int domain, int port) {
 
     status = WaitForSingleObject(path_watch_event, 100);
     if (status != WAIT_OBJECT_0) {
-        Log(XLL_ERROR, "Wait for xenstore (1) failed: 0x%x", GetLastError());
+        Log(XLL_WARNING, "Wait for xenstore (1) failed: 0x%x", GetLastError());
         // don't fail completely yet, if we can read the store values we're ok
     }
 
     // wait two times because Xen always signals the watch immediately after creation
     status = WaitForSingleObject(path_watch_event, 100);
     if (status != WAIT_OBJECT_0) {
-        Log(XLL_ERROR, "Wait for xenstore (2) failed: 0x%x", GetLastError());
+        Log(XLL_WARNING, "Wait for xenstore (2) failed: 0x%x", GetLastError());
     }
 
     XcStoreRemoveWatch(xc_handle, path_watch_handle);

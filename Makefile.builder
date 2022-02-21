@@ -11,6 +11,7 @@ ifeq ($(PACKAGE_SET),vm)
   WIN_BUILD_DEPS = vmm-xen-windows-pvdrivers
   WIN_OUTPUT_LIBS = bin
   WIN_OUTPUT_HEADERS = include
+  WIN_OUTPUT_BIN = bin
   WIN_PREBUILD_CMD = set_version.bat && powershell -executionpolicy bypass -File set_version.ps1 < nul
   WIN_SLN_DIR = vs2017
 endif
