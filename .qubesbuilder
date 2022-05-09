@@ -1,10 +1,10 @@
 host:
   rpm:
-    spec:
+    build:
     - rpm_spec/libvchan.spec
 vm:
   rpm:
-    spec:
+    build:
     - rpm_spec/libvchan.spec
   deb:
     build:
