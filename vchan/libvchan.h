@@ -23,6 +23,7 @@
 #define _LIBVCHAN_H
 
 #include <stdint.h>
+#include <stddef.h>
 typedef int EVTCHN;
 
 /* config vchan features */
