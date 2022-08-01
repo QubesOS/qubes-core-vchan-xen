@@ -181,6 +181,8 @@ void libvchan_close(libvchan_t *ctrl) {
         }
         free(ctrl->xs_path);
     }
+    if (ctrl->xc_handle)
+        xc_interface_close(ctrl->xc_handle);
     free(ctrl);
 }
 
