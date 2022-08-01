@@ -138,18 +138,17 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         }
     }
 
-    if (own_domid)
-        free(own_domid);
+    free(own_domid);
     xs_close(xs);
 
     ctrl = malloc(sizeof(*ctrl));
     if (!ctrl)
-        return NULL;
+        goto err_xc;
     ctrl->xs_path = NULL;
     ctrl->xenvchan = libxenvchan_client_init(NULL, domain, xs_path);
     if (!ctrl->xenvchan) {
         free(ctrl);
-        return NULL;
+        goto err_xc;
     }
     ctrl->xenvchan->blocking = 1;
     /* notify server */
