@@ -26,6 +26,7 @@
 #include <string.h>
 #include <xenstore.h>
 #include <xenctrl.h>
+#include <poll.h>
 #include "libvchan.h"
 #include "libvchan_private.h"
 
@@ -98,12 +99,11 @@ int libvchan_wait(libvchan_t *ctrl) {
          * right away).
          */
         while (ret == -2 && libxenvchan_is_open(ctrl->xenvchan) == 2) {
-            fd_set rd_set;
-            struct timeval tv = { 10, 0 };
             int vchan_fd = libxenvchan_fd_for_select(ctrl->xenvchan);
-            FD_ZERO(&rd_set);
-            FD_SET(vchan_fd, &rd_set);
-            switch (select(vchan_fd+1, &rd_set, NULL, NULL, &tv)) {
+            struct pollfd fds[] = {
+                { .fd = vchan_fd, .events = POLLIN, .revents = 0 },
+            };
+            switch (poll(fds, 1, 10000)) {
                 case 0:
                     if (!libvchan__check_domain_alive(ctrl->xc_handle, ctrl->remote_domain))
                         return -1;
@@ -115,7 +115,7 @@ int libvchan_wait(libvchan_t *ctrl) {
                 default:
                     if (errno == EINTR)
                         break;
-                    perror("select");
+                    perror("poll");
                     return -1;
             }
         }
