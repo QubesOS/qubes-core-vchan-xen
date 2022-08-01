@@ -29,30 +29,29 @@
 #include "libvchan_private.h"
 
 libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t write_min) {
-    char xs_path[255];
     libvchan_t *ctrl;
 
-    ctrl = malloc(sizeof(*ctrl));
+    ctrl = calloc(sizeof(*ctrl), 1);
     if (!ctrl)
         return NULL;
 
-    snprintf(xs_path, sizeof(xs_path), "data/vchan/%d/%d", domain, port);
-    ctrl->xenvchan = libxenvchan_server_init(NULL, domain, xs_path, read_min, write_min);
-    if (!ctrl->xenvchan) {
-        free(ctrl);
-        return NULL;
-    }
-    ctrl->xs_path = strdup(xs_path);
+    if (asprintf(&ctrl->xs_path, "data/vchan/%d/%d", domain, port) < 0)
+        goto err_asprintf;
+    ctrl->xenvchan = libxenvchan_server_init(NULL, domain, ctrl->xs_path, read_min, write_min);
+    if (!ctrl->xenvchan)
+        goto err_server_init;
     ctrl->xenvchan->blocking = 1;
     ctrl->remote_domain = domain;
-    ctrl->xc_handle = xc_interface_open(NULL, NULL, 0);
-    if (!ctrl->xc_handle) {
-        /* error already logged by xc_interface_open */
-        libxenvchan_close(ctrl->xenvchan);
-        free(ctrl);
-        return NULL;
-    }
+    if (!(ctrl->xc_handle = xc_interface_open(NULL, NULL, 0)))
+        goto err_xc_open;
     return ctrl;
+err_xc_open:
+    libxenvchan_close(ctrl->xenvchan);
+err_server_init:
+    free(ctrl->xs_path);
+err_asprintf:
+    free(ctrl);
+    return NULL;
 }
 
 libvchan_t *libvchan_client_init(int domain, int port) {
