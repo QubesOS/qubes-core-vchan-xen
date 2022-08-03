@@ -1,3 +1,4 @@
+ifeq ($(BACKEND_VMM),xen)
 RPM_SPEC_FILES := rpm_spec/libvchan.spec
 ARCH_BUILD_DIRS := archlinux
 
@@ -16,4 +17,5 @@ ifeq ($(PACKAGE_SET),vm)
   WIN_SLN_DIR = vs2017
 endif
 
+endif
 # vim: filetype=make
