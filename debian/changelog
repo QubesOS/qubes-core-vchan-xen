@@ -1,3 +1,33 @@
+libvchan-xen (4.1.8-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Make the code compile with MinGW
+  * Add Makefile for MinGW build
+
+  [ Mikhail Lukashov ]
+  * windows: improve logging
+
+  [ Frédéric Pierret (fepitre) ]
+  * Drop Travis CI
+  * Add Qubes Builder v2 integration
+  * .qubesbuilder: replace 'spec' by 'build'
+
+  [ Marek Marczykowski-Górecki ]
+  * ci: include windows build too
+
+  [ Frédéric Pierret (fepitre) ]
+  * Makefile.builder: restrict build for BACKEND_VMM=xen
+
+  [ Demi Marie Obenour ]
+  * Do not leak Xen control interface
+  * Avoid leaks in libvchan_server_init()
+  * libvchan_client_init(): avoid leaking resources
+  * Include <stddef.h> before using size_t
+  * Switch from select() to poll()
+  * Add -D_FORTIFY_SOURCE=2 unconditionally
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 31 Aug 2022 09:33:23 +0200
+
 libvchan-xen (4.1.7-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
