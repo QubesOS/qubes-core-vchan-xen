@@ -73,6 +73,10 @@ int libvchan_read(libvchan_t *ctrl, void *data, size_t size) {
     return libxenvchan_read(ctrl->xenvchan, (char*)data, size);
 }
 
+void libvchan_set_blocking(libvchan_t *ctrl, bool blocking) {
+    ctrl->xenvchan->blocking = blocking;
+}
+
 int libvchan_recv(libvchan_t *ctrl, void *data, size_t size) {
     return libxenvchan_recv(ctrl->xenvchan, (char*)data, size);
 }
