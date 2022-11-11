@@ -4,3 +4,4 @@ deb/
 *.o
 *.so
 *.pc
+*.o.dep
