@@ -70,6 +70,11 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         return NULL;
     }
 
+    if (port < 0) {
+        fprintf(stderr, "Invalid port %d\n", port);
+        return NULL;
+    }
+
     xc_handle = xc_interface_open(NULL, NULL, 0);
     if (!xc_handle) {
         /* error already logged by xc_interface_open */
