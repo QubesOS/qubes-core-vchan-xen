@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef _LIBVCHAN_PRIVATE_H
-#define _LIBVCHAN_PRIVATE_H
+#ifndef LIBVCHAN_PRIVATE_H
+#define LIBVCHAN_PRIVATE_H
 
 #include <libxenvchan.h>
 
