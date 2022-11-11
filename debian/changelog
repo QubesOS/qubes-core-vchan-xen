@@ -1,3 +1,10 @@
+libvchan-xen (4.1.9-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Allow controlling the blocking flag of a vchan
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 11 Nov 2022 11:41:48 +0100
+
 libvchan-xen (4.1.8-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
