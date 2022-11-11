@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 typedef int EVTCHN;
 
 /* config vchan features */
