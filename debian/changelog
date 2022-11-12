@@ -1,3 +1,14 @@
+libvchan-xen (4.1.10-1) wheezy; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Add missing <stdbool.h> include
+  * Avoid using reserved identifiers in macros
+  * Better build system
+  * Validate peer domain IDs
+  * Validate port numbers
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 13 Nov 2022 00:00:45 +0100
+
 libvchan-xen (4.1.9-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
