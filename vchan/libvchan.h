@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef _LIBVCHAN_H
-#define _LIBVCHAN_H
+#ifndef LIBVCHAN_H
+#define LIBVCHAN_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -60,4 +60,4 @@ int libvchan_data_ready(libvchan_t *ctrl);
 int libvchan_buffer_space(libvchan_t *ctrl);
 void libvchan_set_blocking(libvchan_t *ctrl, bool blocking);
 
-#endif /* _LIBVCHAN_H */
+#endif /* LIBVCHAN_H */
