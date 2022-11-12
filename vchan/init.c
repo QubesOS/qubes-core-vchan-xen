@@ -65,6 +65,16 @@ libvchan_t *libvchan_client_init(int domain, int port) {
     char *dummy = NULL;
     char *own_domid = NULL;
 
+    if (domain < 0 || (unsigned)domain >= DOMID_FIRST_RESERVED) {
+        fprintf(stderr, "Invalid peer domain ID %d\n", domain);
+        return NULL;
+    }
+
+    if (port < 0) {
+        fprintf(stderr, "Invalid port %d\n", port);
+        return NULL;
+    }
+
     xc_handle = xc_interface_open(NULL, NULL, 0);
     if (!xc_handle) {
         /* error already logged by xc_interface_open */
