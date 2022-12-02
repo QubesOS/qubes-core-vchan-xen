@@ -9,7 +9,7 @@ Homepage: http://www.qubes-os.org
 Package: libvchan-xen
 Section: libs
 Architecture: amd64
-Depends: libxenstore3.0, ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts: qubes-core-vchan-xen
 Provides: libvchan
 Description: Qubes Xen core libraries
