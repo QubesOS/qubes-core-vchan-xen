@@ -29,7 +29,7 @@ LIBXC_INCLUDES := $(if $(wildcard $(XEN_ROOT)/tools/libxc/include),\
 		$(XEN_ROOT)/tools/libxc)
 
 CFLAGS+=-Wall -Wextra -Werror -I$(LIBXC_INCLUDES) -I$(XEN_ROOT)/tools/libvchan \
-        -DCONFIG_STUBDOM -fPIC -O2 -D_GNU_SOURCE -D_FORTIFY_SOURCE=2 -MD -MP -MF $@.dep
+        -DCONFIG_STUBDOM -fPIC -O2 -D_GNU_SOURCE -D_FORTIFY_SOURCE=3 -MD -MP -MF $@.dep
 all: libvchan.a
 -include *.dep
 
