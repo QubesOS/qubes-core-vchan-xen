@@ -173,8 +173,8 @@ void libvchan_close(libvchan_t *ctrl) {
     struct xs_handle *xs;
 
     libxenvchan_close(ctrl->xenvchan);
-    if (ctrl->xs_path) {
-        /* remove xenstore entry in case of no client connected */
+    if (ctrl->xenvchan && ctrl->xs_path) {
+        /* remove server xenstore entry in case of no client connected */
         xs = xs_open(0);
         if (xs) {
             /* if xenstore connection failed just do not remove entries, but do
@@ -185,6 +185,9 @@ void libvchan_close(libvchan_t *ctrl) {
         }
         free(ctrl->xs_path);
     }
+    /* this releases watches too */
+    if (ctrl->xs)
+        xs_close(ctrl->xs);
     if (ctrl->xc_handle)
         xc_interface_close(ctrl->xc_handle);
     free(ctrl);

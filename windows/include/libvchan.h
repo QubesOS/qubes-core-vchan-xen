@@ -103,6 +103,18 @@ int libvchan_data_ready(libvchan_t *ctrl);
 LIBVCHAN_API
 int libvchan_buffer_space(libvchan_t *ctrl);
 
+/* TODO:
+
+LIBVCHAN_API
+libvchan_t *libvchan_client_init_async(int domain, int port, EVTCHN *watch_fd);
+
+LIBVCHAN_API
+int libvchan_client_init_async_finish(libvchan_t *ctrl);
+
+LIBVCHAN_API
+void libvchan_client_init_async_cancel(libvchan_t *ctrl);
+*/
+
 #ifdef __cplusplus
 }
 #endif

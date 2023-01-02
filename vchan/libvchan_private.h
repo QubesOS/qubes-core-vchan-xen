@@ -26,10 +26,16 @@
 
 struct libvchan {
     struct libxenvchan *xenvchan;
-    /* store path, which should be removed after client connect (server only) */
+    /*
+     * server: path to be removed when client connects,
+     * client: path currently watched, for async init
+     */
     char *xs_path;
     int remote_domain;
+    int local_domain;
+    int port;
     xc_interface *xc_handle;
+    struct xs_handle *xs;
 };
 
 int libvchan__check_domain_alive(xc_interface *xc_handle, int dom);

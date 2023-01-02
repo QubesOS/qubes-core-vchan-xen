@@ -47,6 +47,19 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
 
 libvchan_t *libvchan_client_init(int domain, int port);
 
+/* An alternative path for client connection:
+ * 1. Call libvchan_client_init_async().
+ * 2. Wait for watch_fd to become readable.
+ * 3. When readable, call libvchan_client_init_async_finish().
+ *
+ * Repeat steps 2-3 until libvchan_client_init_async_finish returns 0. Abort on
+ * negative values (error).
+ * If connection attempt failed or should be aborted, call libvchan_close() to
+ * clean up.
+ */
+libvchan_t *libvchan_client_init_async(int domain, int port, EVTCHN *watch_fd);
+int libvchan_client_init_async_finish(libvchan_t *ctrl, bool blocking);
+
 int libvchan_write(libvchan_t *ctrl, const void *data, size_t size);
 int libvchan_send(libvchan_t *ctrl, const void *data, size_t size);
 int libvchan_read(libvchan_t *ctrl, void *data, size_t size);
