@@ -62,22 +62,41 @@ int libvchan__check_domain_alive(xc_interface *xc_handle, int dom) {
 }
 
 int libvchan_write(libvchan_t *ctrl, const void *data, size_t size) {
+    if (!ctrl->xenvchan) {
+        errno = EAGAIN;
+        return -1;
+    }
     return libxenvchan_write(ctrl->xenvchan, (char*)data, size);
 }
 
 int libvchan_send(libvchan_t *ctrl, const void *data, size_t size) {
+    if (!ctrl->xenvchan) {
+        errno = EAGAIN;
+        return -1;
+    }
     return libxenvchan_send(ctrl->xenvchan, (char*)data, size);
 }
 
 int libvchan_read(libvchan_t *ctrl, void *data, size_t size) {
+    if (!ctrl->xenvchan) {
+        errno = EAGAIN;
+        return -1;
+    }
     return libxenvchan_read(ctrl->xenvchan, (char*)data, size);
 }
 
 void libvchan_set_blocking(libvchan_t *ctrl, bool blocking) {
+    if (!ctrl->xenvchan)
+        /* this API call doesn't have way to report errors */
+        abort();
     ctrl->xenvchan->blocking = blocking;
 }
 
 int libvchan_recv(libvchan_t *ctrl, void *data, size_t size) {
+    if (!ctrl->xenvchan) {
+        errno = EAGAIN;
+        return -1;
+    }
     return libxenvchan_recv(ctrl->xenvchan, (char*)data, size);
 }
 
@@ -85,6 +104,9 @@ int libvchan_wait(libvchan_t *ctrl) {
     int ret = -2; /* invalid, so can be distinguished from real
                      libxenvchan_wait return code */
     struct xs_handle *xs;
+
+    if (!ctrl->xenvchan)
+        return 0;
 
     if (ctrl->xenvchan->is_server && libxenvchan_is_open(ctrl->xenvchan) == 2) {
         /* In case of vchan server waiting for a client, we'll not receive any
@@ -172,7 +194,8 @@ int libvchan_wait(libvchan_t *ctrl) {
 void libvchan_close(libvchan_t *ctrl) {
     struct xs_handle *xs;
 
-    libxenvchan_close(ctrl->xenvchan);
+    if (ctrl->xenvchan)
+        libxenvchan_close(ctrl->xenvchan);
     if (ctrl->xenvchan && ctrl->xs_path) {
         /* remove server xenstore entry in case of no client connected */
         xs = xs_open(0);
@@ -194,20 +217,31 @@ void libvchan_close(libvchan_t *ctrl) {
 }
 
 EVTCHN libvchan_fd_for_select(libvchan_t *ctrl) {
+    if (!ctrl->xenvchan) {
+        errno = EAGAIN;
+        return -1;
+    }
     return libxenvchan_fd_for_select(ctrl->xenvchan);
 }
 
 int libvchan_data_ready(libvchan_t *ctrl) {
+    if (!ctrl->xenvchan)
+        return 0;
     return libxenvchan_data_ready(ctrl->xenvchan);
 }
 
 int libvchan_buffer_space(libvchan_t *ctrl) {
+    if (!ctrl->xenvchan)
+        return 0;
     return libxenvchan_buffer_space(ctrl->xenvchan);
 }
 
 int libvchan_is_open(libvchan_t *ctrl) {
     int ret;
     struct evtchn_status evst;
+
+    if (!ctrl->xenvchan)
+        return VCHAN_WAITING;
 
     ret = libxenvchan_is_open(ctrl->xenvchan);
     if (ret == 2) {

@@ -37,7 +37,7 @@ typedef int EVTCHN;
 #define VCHAN_DISCONNECTED 0
 /* connected */
 #define VCHAN_CONNECTED 1
-/* vchan server initialized, waiting for client to connect */
+/* vchan initialized, waiting for client to connect, or server to appear */
 #define VCHAN_WAITING 2
 
 struct libvchan;
@@ -71,6 +71,10 @@ int libvchan_is_open(libvchan_t *ctrl);
 
 int libvchan_data_ready(libvchan_t *ctrl);
 int libvchan_buffer_space(libvchan_t *ctrl);
+/* Must be called only after successful libvchan_*_init(). When using
+ * libvchan_client_init_async(), prefer using blocking parameter to
+ * libvchan_client_init_async_finish() instead.
+ */
 void libvchan_set_blocking(libvchan_t *ctrl, bool blocking);
 
 #endif /* LIBVCHAN_H */
