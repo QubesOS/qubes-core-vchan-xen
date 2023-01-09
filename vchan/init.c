@@ -28,6 +28,20 @@
 #include "libvchan.h"
 #include "libvchan_private.h"
 
+static domid_t parse_domid(const char *ptr) {
+    char *endptr;
+    unsigned long ret;
+
+    if (!ptr)
+        return DOMID_INVALID;
+    if (ptr[0] == '0')
+        return ptr[1] ? DOMID_INVALID : 0;
+    if (ptr[0] < '1' || ptr[0] > '9')
+        return DOMID_INVALID;
+    ret = strtoul(ptr, &endptr, 10);
+    return (*endptr || ret >= DOMID_FIRST_RESERVED) ? DOMID_INVALID : (domid_t)ret;
+}
+
 libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t write_min) {
     libvchan_t *ctrl;
 
@@ -112,6 +126,8 @@ libvchan_t *libvchan_client_init(int domain, int port) {
             free(vec);
         }
         if (!own_domid) {
+            int v;
+
             /* construct xenstore path on first iteration and on every domid
              * change detected (save+restore case) */
             own_domid = xs_read(xs, 0, "domid", &len);
@@ -119,16 +135,30 @@ libvchan_t *libvchan_client_init(int domain, int port) {
                 fprintf(stderr, "Cannot get own domid\n");
                 goto err_xs;
             }
-            if (atoi(own_domid) == domain) {
+            int own_domid_num = parse_domid(own_domid);
+            if (own_domid_num == DOMID_INVALID) {
+                fprintf(stderr, "Invalid own domid %s\n", own_domid);
+                free(own_domid);
+                goto err_xs;
+            }
+            if (own_domid_num == domain) {
                 fprintf(stderr, "Loopback vchan connection not supported\n");
                 free(own_domid);
                 goto err_xs;
             }
 
-            snprintf(xs_path, sizeof(xs_path), "/local/domain/%d/data/vchan/%s/%d",
-                    domain, own_domid, port);
+            v = snprintf(xs_path, sizeof(xs_path), "/local/domain/%d/data/vchan/%s/%d",
+                         domain, own_domid, port);
+            if ((unsigned)v >= sizeof(xs_path)) {
+                free(own_domid);
+                goto err_xs;
+            }
             /* watch on this key as we might not have access to the whole directory */
-            snprintf(xs_path_watch, sizeof(xs_path_watch), "%.128s/event-channel", xs_path);
+            v = snprintf(xs_path_watch, sizeof(xs_path_watch), "%.128s/event-channel", xs_path);
+            if ((unsigned)v >= sizeof(xs_path_watch)) {
+                free(own_domid);
+                goto err_xs;
+            }
 
             if (!xs_watch(xs, xs_path_watch, xs_path_watch)) {
                 fprintf(stderr, "Cannot setup watch on %s\n", xs_path_watch);
