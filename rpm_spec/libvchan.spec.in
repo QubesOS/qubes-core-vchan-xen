@@ -59,7 +59,9 @@ rm -rf $RPM_BUILD_ROOT
 rm -f %{name}-%{version}
 
 %files
+# keep for compat reason, move to -devel when everything gets rebuilt
 %{_libdir}/libvchan-xen.so
+%{_libdir}/libvchan-xen.so.*
 
 %package devel
 Summary:        Include files for qubes core libraries
