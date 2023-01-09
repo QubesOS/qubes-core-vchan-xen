@@ -10,7 +10,7 @@ include /usr/share/dpkg/default.mk
 export DESTDIR=$(shell pwd)/debian/tmp
 
 %:
-	dh $@ --with autotools-dev
+	dh $@
 
 override_dh_auto_build:
 	make all LIBDIR=/usr/lib
