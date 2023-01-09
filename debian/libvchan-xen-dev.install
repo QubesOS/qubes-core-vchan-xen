@@ -1,3 +1,4 @@
+usr/lib/libvchan-xen.so
 usr/include/vchan-xen/libvchan.h
 usr/lib/pkgconfig/vchan-xen.pc
 usr/lib/pkgconfig/vchan.pc
