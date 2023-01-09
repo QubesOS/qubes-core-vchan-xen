@@ -10,10 +10,7 @@ all:
 	$(MAKE) -C vchan -f Makefile.linux
 
 install:
-	install -D -m 0644 vchan/libvchan.h ${DESTDIR}$(INCLUDEDIR)/vchan-xen/libvchan.h
-	install -D -m 0644 vchan/vchan-xen.pc ${DESTDIR}$(LIBDIR)/pkgconfig/vchan-xen.pc
-	install -D vchan/libvchan-xen.so ${DESTDIR}$(LIBDIR)/libvchan-xen.so
-	cd ${DESTDIR}$(LIBDIR)/pkgconfig && ln -s vchan-xen.pc vchan.pc
+	$(MAKE) -C vchan -f Makefile.linux install
 
 clean:
 	make -C vchan -f Makefile.linux clean

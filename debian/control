@@ -6,7 +6,7 @@ Build-Depends: debhelper, quilt, autotools-dev, libxen-dev
 Standards-Version: 3.9.5
 Homepage: http://www.qubes-os.org
 
-Package: libvchan-xen
+Package: libvchan-xen1
 Section: libs
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -20,6 +20,8 @@ Package: libvchan-xen-dev
 Section: libdevel
 Architecture: amd64
 Conflicts: qubes-core-vchan-xen
-Depends: libvchan-xen (= ${binary:Version}), ${misc:Depends}
+Breaks: libvchan-xen (<< 4.2.0)
+Replaces: libvchan-xen (<< 4.2.0)
+Depends: libvchan-xen1 (= ${binary:Version}), ${misc:Depends}
 Provides: libvchan-dev
 Description: Development files for Qubes libvchan communication library.
