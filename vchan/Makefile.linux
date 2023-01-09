@@ -29,8 +29,8 @@ all: libvchan-xen.so vchan-xen.pc
 
 SO_VER = 1
 
-libvchan-xen.so.$(SO_VER) : init.o io.o
-	$(CC) $(LDFLAGS) -Wl,-soname,$@ -shared -o $@ $^ -lxenvchan -lxenctrl
+libvchan-xen.so.$(SO_VER): init.o io.o
+	$(CC) $(LDFLAGS) -Wl,-soname,$@ -shared -o $@ $^ -lxenvchan -lxenctrl -lxenstore
 
 libvchan-xen.so: libvchan-xen.so.$(SO_VER)
 	ln -s $< $@
