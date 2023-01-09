@@ -1,3 +1,9 @@
+libvchan-xen (4.1.13-1) unstable; urgency=medium
+
+  * debian: do not hardcode libxenstore version
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 09 Jan 2023 16:39:19 +0100
+
 libvchan-xen (4.1.12-1) unstable; urgency=medium
 
   * debian: do not hardcode libxenstore version
