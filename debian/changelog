@@ -1,3 +1,15 @@
+libvchan-xen (4.2.0-1) unstable; urgency=medium
+
+  * Interface for async client connection
+  * Make all the public function deal with half-open client vchan
+  * Properly define soname
+  * Link with libxenstore
+  * debian: rename package for proper soname handling
+  * debian: fail the build if files are missing
+  * debian: bump compat level to 10
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 09 Jan 2023 05:02:12 +0100
+
 libvchan-xen (4.1.12-1) unstable; urgency=medium
 
   * debian: do not hardcode libxenstore version
