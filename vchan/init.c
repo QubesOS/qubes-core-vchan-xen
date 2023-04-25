@@ -169,11 +169,12 @@ int libvchan_client_init_async_finish(libvchan_t *ctrl, bool blocking) {
             goto err;
         }
         int own_domid_num = parse_domid(own_domid);
-        free(own_domid);
         if (own_domid_num == DOMID_INVALID) {
             fprintf(stderr, "Invalid own domid %s\n", own_domid);
+            free(own_domid);
             goto err;
         }
+        free(own_domid);
         if (own_domid_num == ctrl->remote_domain) {
             fprintf(stderr, "Loopback vchan connection not supported\n");
             goto err;
