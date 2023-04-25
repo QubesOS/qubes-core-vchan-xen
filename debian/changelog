@@ -1,3 +1,14 @@
+libvchan-xen (4.2.1-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix use after free detected by GCC 13
+
+  [ Frédéric Pierret (fepitre) ]
+  * Rework Archlinux packaging
+  * archlinux: support for new packaging in legacy builder
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 25 Apr 2023 22:59:39 +0200
+
 libvchan-xen (4.2.0-1) unstable; urgency=medium
 
   * Interface for async client connection
