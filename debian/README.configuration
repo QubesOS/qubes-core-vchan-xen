@@ -6,8 +6,6 @@ https://www.debian.org/doc/manuals/maint-guide/first.en.html
 ===============================================================================
                                Bash.rc
 ===============================================================================
-# Assume usename 'user' running this, otherwise
-# /home/user/.bashrc
 cat >>~/.bashrc <<'EOF'
 DEBMAIL="user@chroot.local"
 DEBFULLNAME="Qubes Builder"
