@@ -33,7 +33,7 @@ libvchan-xen.so.$(SO_VER): init.o io.o
 	$(CC) $(LDFLAGS) -Wl,-soname,$@ -shared -o $@ $^ -lxenvchan -lxenctrl -lxenstore
 
 libvchan-xen.so: libvchan-xen.so.$(SO_VER)
-	ln -s $< $@
+	ln -sf $< $@
 
 clean:
 	rm -f *.o *so *~ client server node node-select
@@ -42,8 +42,8 @@ install: vchan-xen.pc libvchan.h libvchan-xen.so.$(SO_VER)
 	install -D -m 0644 libvchan.h $(DESTDIR)$(INCLUDEDIR)/vchan-xen/libvchan.h
 	install -D -m 0644 vchan-xen.pc $(DESTDIR)$(LIBDIR)/pkgconfig/vchan-xen.pc
 	install -D -t $(DESTDIR)$(LIBDIR)/ libvchan-xen.so.$(SO_VER)
-	ln -s libvchan-xen.so.$(SO_VER) $(DESTDIR)$(LIBDIR)/libvchan-xen.so
-	ln -s vchan-xen.pc $(DESTDIR)$(LIBDIR)/pkgconfig/vchan.pc
+	ln -sf libvchan-xen.so.$(SO_VER) $(DESTDIR)$(LIBDIR)/libvchan-xen.so
+	ln -sf vchan-xen.pc $(DESTDIR)$(LIBDIR)/pkgconfig/vchan.pc
 
 vchan-xen.pc: vchan-xen.pc.in
 	sed -e "s/@VERSION@/`cat ../version`/" \
