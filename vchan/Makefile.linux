@@ -36,7 +36,7 @@ libvchan-xen.so: libvchan-xen.so.$(SO_VER)
 	ln -sf $< $@
 
 clean:
-	rm -f *.o *so *~ client server node node-select
+	rm -f *.o *so *~ client server node node-select vchan-xen.pc
 
 install: vchan-xen.pc libvchan.h libvchan-xen.so.$(SO_VER)
 	install -D -m 0644 libvchan.h $(DESTDIR)$(INCLUDEDIR)/vchan-xen/libvchan.h
