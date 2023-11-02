@@ -77,6 +77,7 @@ Requires:       pkgconfig
 %description devel
 
 %files devel
+%dir %{_includedir}/vchan-xen
 %{_includedir}/vchan-xen/libvchan.h
 %{_libdir}/libvchan-xen.so
 %{_libdir}/pkgconfig/vchan-xen.pc
