@@ -23,7 +23,7 @@
 
 Name:		qubes-libvchan-xen
 Version:	@VERSION@
-Release:	1%{dist}
+Release:	1%{?dist}
 
 Summary:	Qubes vchan libraries
 License:	GPL v2 only
