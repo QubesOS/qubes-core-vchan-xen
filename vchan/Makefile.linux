@@ -23,7 +23,7 @@ PREFIX ?= /usr
 LIBDIR ?= $(PREFIX)/lib
 INCLUDEDIR ?= $(PREFIX)/include
 CC ?= gcc
-CFLAGS += -g -Wall -Wextra -Werror -fPIC -O2 -D_GNU_SOURCE -D_FORTIFY_SOURCE=2 -MD -MP -MF $@.dep
+CFLAGS += -g -Wall -Wextra -Werror -fPIC -O2 -D_GNU_SOURCE -MD -MP -MF $@.dep
 all: libvchan-xen.so vchan-xen.pc
 -include *.dep
 
