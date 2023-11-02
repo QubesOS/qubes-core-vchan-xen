@@ -1,3 +1,22 @@
+libvchan-xen (4.2.2-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * gitlab-ci: use CI_BRANCH_REF
+
+  [ Demi Marie Obenour ]
+  * Avoid mention of username "user"
+  * Clobber already-existing symlinks
+  * Remove pkg-config file in 'make clean'
+  * Add missing -L${libdir} to pkg-config
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: fix missing ? in dist tag
+  * rpm: move libvchan-xen.so to -devel package
+  * rpm: add directory ownership
+  * Drop forced -D_FORTIFY_SOURCE=2
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 02 Nov 2023 02:10:31 +0100
+
 libvchan-xen (4.2.1-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
