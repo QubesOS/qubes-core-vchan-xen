@@ -33,14 +33,24 @@
 /* check if domain is still alive */
 int libvchan__check_domain_alive(xc_interface *xc_handle, int dom) {
     struct evtchn_status evst;
+#ifdef HAVE_XC_DOMAIN_GETINFO_SINGLE
+    xc_domaininfo_t dominfo;
+#else
     xc_dominfo_t dominfo;
+#endif
     int ret;
 
     /* first try using domctl, more reliable but available in a privileged
      * domain only */
+#ifdef HAVE_XC_DOMAIN_GETINFO_SINGLE
+    ret = xc_domain_getinfo_single(xc_handle, dom, &dominfo);
+    if (ret == 0)
+        return !(dominfo.flags & XEN_DOMINF_dying);
+#else
     ret = xc_domain_getinfo(xc_handle, dom, 1, &dominfo);
     if (ret == 1)
         return dominfo.domid == (uint32_t)dom && !dominfo.dying;
+#endif
     else if (ret == -1 && errno == ESRCH)
         return 0;
     /* otherwise fallback to xc_evtchn_status method */
