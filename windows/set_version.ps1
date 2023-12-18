@@ -1,10 +1,18 @@
-$version = Get-Content "../version"
-# qubes version has 3 parts, windows needs 4
-$version += ".0"
-$version_str = "`"" + $version + "`""
-$version = %{$version -replace "\.", ","}
-$hdr = "#define QTW_FILEVERSION " + $version + "`n"
-$hdr += "#define QTW_FILEVERSION_STR " + $version_str + "`n"
-$hdr += "#define QTW_PRODUCTVERSION 3.0.0.0`n"
-$hdr += "#define QTW_PRODUCTVERSION_STR `"3.0.0.0`"`n"
-Set-Content -Path "version.h" $hdr
+function GenerateVersionHeader {
+    param(
+        [Parameter(Mandatory)] [string]$in,
+        [Parameter(Mandatory)] [string]$out
+    )
+    $version = Get-Content $in
+    # qubes version has 3 parts, windows needs 4
+    $version += ".0"
+    $version_str = "`"" + $version + "`""
+    $version = %{$version -replace "\.", ","}
+    $hdr = "#define QWT_FILEVERSION " + $version + "`n"
+    $hdr += "#define QWT_FILEVERSION_STR " + $version_str + "`n"
+    $hdr += "#define QWT_PRODUCTVERSION QWT_FILEVERSION`n"
+    $hdr += "#define QWT_PRODUCTVERSION_STR QWT_FILEVERSION_STR`n"
+    Set-Content -Path $out $hdr
+}
+
+GenerateVersionHeader $args[0] $args[1]
