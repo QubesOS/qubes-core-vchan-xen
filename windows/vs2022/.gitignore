@@ -1,4 +1,4 @@
 /.vs
 /x64/
 /tmp/
-/*.user
+/**/*.user
