@@ -27,6 +27,10 @@ CFLAGS += -g -Wall -Wextra -Werror -fPIC -O2 -D_GNU_SOURCE -MD -MP -MF $@.dep
 all: libvchan-xen.so vchan-xen.pc
 -include *.dep
 
+# xenctrl.h does not provide any #define to distinguish API versions
+XENCTRL_VERSION := $(shell pkg-config --modversion xencontrol)
+CFLAGS += $(shell if printf '%s\n' '4.18.0' '$(XENCTRL_VERSION)' | \
+                  sort -CV; then echo -DHAVE_XC_DOMAIN_GETINFO_SINGLE; fi)
 SO_VER = 1
 
 libvchan-xen.so.$(SO_VER): init.o io.o
