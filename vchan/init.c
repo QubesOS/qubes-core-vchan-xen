@@ -47,7 +47,7 @@ static domid_t parse_domid(const char *ptr) {
 libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t write_min) {
     libvchan_t *ctrl;
 
-    ctrl = calloc(sizeof(*ctrl), 1);
+    ctrl = calloc(1, sizeof(*ctrl));
     if (!ctrl)
         return NULL;
 
