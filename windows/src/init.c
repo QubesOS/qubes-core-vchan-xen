@@ -29,19 +29,26 @@
 
 // global state since we want it to work before the control structure is initialized
 static XENCONTROL_LOGGER *g_logger = NULL;
+static XENCONTROL_LOG_LEVEL g_log_level = XLL_INFO;
 
-void libvchan_register_logger(libvchan_logger_t *logger)
+void libvchan_register_logger(libvchan_logger_t *logger, int log_level)
 {
     if (!logger)
         return;
 
     g_logger = (XENCONTROL_LOGGER*)logger;
+
+    if (log_level != 0)
+        g_log_level = log_level;
 }
 
 void _Log(XENCONTROL_LOG_LEVEL logLevel, LPCSTR function, PWCHAR format, ...) {
     va_list args;
 
     if (!g_logger)
+        return;
+
+    if (logLevel > g_log_level)
         return;
 
     va_start(args, format);
@@ -58,7 +65,7 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
         return NULL;
 
     snprintf(xs_path, sizeof(xs_path), "data/vchan/%d/%d", domain, port);
-    ctrl->xenvchan = libxenvchan_server_init(g_logger, domain, xs_path, read_min, write_min);
+    ctrl->xenvchan = libxenvchan_server_init(g_logger, domain, xs_path, read_min, write_min, g_log_level);
     if (!ctrl->xenvchan) {
         Log(XLL_ERROR, "libxenvchan_server_init failed");
         free(ctrl);
@@ -95,6 +102,8 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         SetLastError(ERROR_NOT_SUPPORTED);
         goto fail;
     }
+
+    XcSetLogLevel(xc_handle, g_log_level);
 
     /* wait for server to appear */
     status = XcStoreRead(xc_handle, "domid", sizeof(own_domid), own_domid);
@@ -147,7 +156,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         goto fail;
 
     ctrl->xs_path = NULL;
-    ctrl->xenvchan = libxenvchan_client_init(g_logger, domain, xs_path);
+    ctrl->xenvchan = libxenvchan_client_init(g_logger, domain, xs_path, g_log_level);
     if (!ctrl->xenvchan) {
         Log(XLL_ERROR, "libxenvchan_client_init(%u, %S) failed", domain, xs_path);
         goto fail;

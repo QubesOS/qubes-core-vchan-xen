@@ -56,8 +56,9 @@ typedef struct libvchan libvchan_t;
 
 typedef void libvchan_logger_t(IN int logLevel, IN const char *function, IN const WCHAR *format, IN va_list args);
 
+/* Log level ranges from 1 (most severe) to 5 (least), 0 = use default (3) */
 LIBVCHAN_API
-void libvchan_register_logger(libvchan_logger_t *logger);
+void libvchan_register_logger(libvchan_logger_t *logger, int log_level);
 
 /*
 Note: libvchan_*_init sets last error to ERROR_NOT_SUPPORTED if
