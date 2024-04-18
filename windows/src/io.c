@@ -100,14 +100,18 @@ int libvchan_wait(libvchan_t *ctrl) {
     }
 #endif
     ret = libxenvchan_wait(ctrl->xenvchan);
+    libvchan_cleanup(ctrl);
+    return ret;
+}
+
+void libvchan_cleanup(libvchan_t* ctrl) {
     if (ctrl->xs_path) {
-        Log(XLL_DEBUG, "client connected, removing xs path %S", ctrl->xs_path);
+        Log(XLL_DEBUG, "removing xs path %S", ctrl->xs_path);
         /* remove xenstore entry at first client connection */
         XcStoreRemove(ctrl->xenvchan->xc, ctrl->xs_path);
         free(ctrl->xs_path);
         ctrl->xs_path = NULL;
     }
-    return ret;
 }
 
 void libvchan_close(libvchan_t *ctrl) {
@@ -115,13 +119,7 @@ void libvchan_close(libvchan_t *ctrl) {
     if (!ctrl)
         return;
 
-    if (ctrl->xs_path) {
-        /* remove xenstore entry in case of no client connected */
-        Log(XLL_DEBUG, "removing xs path %S", ctrl->xs_path);
-        XcStoreRemove(ctrl->xenvchan->xc, ctrl->xs_path);
-        free(ctrl->xs_path);
-    }
-
+    libvchan_cleanup(ctrl);
     libxenvchan_close(ctrl->xenvchan);
     free(ctrl);
 }

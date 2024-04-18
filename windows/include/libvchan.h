@@ -89,6 +89,11 @@ int libvchan_recv(libvchan_t *ctrl, void *data, size_t size);
 LIBVCHAN_API
 int libvchan_wait(libvchan_t *ctrl);
 
+// server: if waiting manually instead of using libvchan_wait()
+// this needs to be called after a client connected to remove the xenstore entry
+LIBVCHAN_API
+void libvchan_cleanup(libvchan_t* ctrl);
+
 LIBVCHAN_API
 void libvchan_close(libvchan_t *ctrl);
 
