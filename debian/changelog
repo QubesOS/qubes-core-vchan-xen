@@ -1,3 +1,11 @@
+libvchan-xen (4.1.14-1) unstable; urgency=medium
+
+  * archlinux: fix 'replaces' field
+  * Drop forced -D_FORTIFY_SOURCE=2
+  * ci: drop R4.2 test builds
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 30 Apr 2024 03:01:31 +0200
+
 libvchan-xen (4.1.13-1) unstable; urgency=medium
 
   * debian: do not hardcode libxenstore version
