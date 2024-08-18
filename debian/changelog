@@ -1,3 +1,9 @@
+libvchan-xen (4.2.4-1) unstable; urgency=medium
+
+  * 
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 18 Aug 2024 02:51:07 +0200
+
 libvchan-xen (4.2.3-1) unstable; urgency=medium
 
   * Support changed libxenctrl API in Xen 4.18.0
