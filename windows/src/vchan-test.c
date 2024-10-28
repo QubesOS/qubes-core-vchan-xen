@@ -175,7 +175,7 @@ int main(int argc, char **argv)
     else
         usage();
 
-    libvchan_register_logger(XcLogger);
+    libvchan_register_logger(XcLogger, XLL_DEBUG);
 
     if (!strcmp(argv[1], "server"))
         ctrl = libvchan_server_init(atoi(argv[3]), atoi(argv[4]), 1024, 1024);
