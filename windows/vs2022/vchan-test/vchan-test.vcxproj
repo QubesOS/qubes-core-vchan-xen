@@ -48,15 +48,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>$(SolutionDir)\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\include;$(QUBES_INCLUDES);$(EWDK_INCLUDE)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(ProjectDir)\..\$(Platform)\$(Configuration)\libvchan;$(QUBES_LIBS);$(EWDK_LIB)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\include;$(QUBES_INCLUDES)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(ProjectDir)\..\$(Platform)\$(Configuration)\libvchan;$(QUBES_LIBS)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>$(SolutionDir)\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\..\include;$(QUBES_INCLUDES);$(EWDK_INCLUDE)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(ProjectDir)\..\$(Platform)\$(Configuration)\libvchan;$(QUBES_LIBS);$(EWDK_LIB)</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(ProjectDir)\..\$(Platform)\$(Configuration)\libvchan;$(QUBES_LIBS)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
   </PropertyGroup>
@@ -76,12 +76,6 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libvchan.lib</AdditionalDependencies>
       <IncrementalLinkDatabaseFile />
     </Link>
-    <PostBuildEvent>
-      <Command>cmd /c for %%e in (exe dll lib pdb) do @xcopy /E /F /Y /I "$(OutDir)\*.%%e" "$(SolutionDir)\..\bin\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copy output</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -102,12 +96,6 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libvchan.lib</AdditionalDependencies>
       <IncrementalLinkDatabaseFile />
     </Link>
-    <PostBuildEvent>
-      <Command>cmd /c for %%e in (exe dll lib pdb) do @xcopy /E /F /Y /I "$(OutDir)\*.%%e" "$(SolutionDir)\..\bin\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copy output</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

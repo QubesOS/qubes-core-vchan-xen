@@ -12,3 +12,12 @@ vm:
   archlinux:
     build:
     - archlinux
+  windows:
+    build:
+    - windows/vs2022/core-vchan-xen.sln
+    bin:
+    - windows/vs2022/x64/@CONFIGURATION@/libvchan/libvchan.dll
+    inc:
+    - windows/include/libvchan.h
+    lib:
+    - windows/vs2022/x64/@CONFIGURATION@/libvchan/libvchan.lib
