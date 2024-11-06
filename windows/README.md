@@ -1,8 +1,5 @@
 # `libvchan` implementation for Windows/Xen.
 
-- TODO: installer for win10 QWT
-- TODO: integrate with Qubes builder
-
 ### Environment variables
 
 - `QUBES_INCLUDES` must contain paths containing `libxenvchan` and `xeniface` includes. Normally it's `<src>/qubes-vmm-xen-windows-pvdrivers/include;<src>/qubes-vmm-xen-windows-pvdrivers/xeniface/include`.
