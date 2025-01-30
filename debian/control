@@ -2,7 +2,12 @@ Source: libvchan-xen
 Section: libs
 Priority: extra
 Maintainer: Jason Mehring <nrgaway@gmail.com>
-Build-Depends: debhelper, quilt, autotools-dev, libxen-dev
+Build-Depends:
+ debhelper,
+ quilt,
+ autotools-dev,
+ pkg-config,
+ libxen-dev
 Standards-Version: 3.9.5
 Homepage: http://www.qubes-os.org
 
