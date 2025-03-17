@@ -111,7 +111,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         Log(XLL_ERROR, "reading domid from xenstore failed: 0x%x", status);
         goto fail;
     }
-    
+
     if (atoi(own_domid) == domain) {
         Log(XLL_ERROR, "Loopback vchan connection not supported");
         goto fail;
@@ -134,9 +134,20 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         goto fail;
     }
 
-    status = WaitForSingleObject(path_watch_event, 100);
+    // xenstore daemon always signals the watch immediately after creation
+    status = WaitForSingleObject(path_watch_event, 500);
     if (status != WAIT_OBJECT_0) {
-        Log(XLL_WARNING, "Wait for xenstore failed (0x%x): 0x%x", status, GetLastError());
+        Log(XLL_WARNING, "Wait for xenstore (1) failed: 0x%x", status);
+        // don't fail completely yet, if we can read the store values we're ok
+    }
+
+    // test if the store entry exists; if not - wait a second time
+    char buf[64];
+    if (XcStoreRead(xc_handle, xs_path_watch, sizeof(buf), buf) != ERROR_SUCCESS) {
+        status = WaitForSingleObject(path_watch_event, 500);
+        if (status != WAIT_OBJECT_0) {
+            Log(XLL_WARNING, "Wait for xenstore (2) failed: 0x%x", status);
+        }
     }
 
     XcStoreRemoveWatch(xc_handle, path_watch_handle);
@@ -154,7 +165,7 @@ libvchan_t *libvchan_client_init(int domain, int port) {
         Log(XLL_ERROR, "libxenvchan_client_init(%u, %S) failed", domain, xs_path);
         goto fail;
     }
-    
+
     ctrl->xenvchan->blocking = 1;
     // notify server - xc handle must be the one that xenvchan opened since we use event channel that was allocated using that handle
     XcEvtchnNotify(ctrl->xenvchan->xc, ctrl->xenvchan->event_port);
