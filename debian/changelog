@@ -1,3 +1,31 @@
+libvchan-xen (4.2.7-1) unstable; urgency=medium
+
+  [ Rafał Wojdyła ]
+  * Update for Windows 10
+  * readme: describe required env variables
+  * Fix build script to run from different directories
+  * Update gitignore
+  * windows: remove 32bit build configurations
+  * windows: remove unused Makefile
+  * Support building from the installer
+  * Make project outputs separate to eliminate postbuild copy overlap
+  * vchan: properly set xencontrol log level
+  * windows: remove unnecessary xenstore wait
+  * windows: add libvchan_cleanup() for xenstore path removal
+  * windows: fix vchan-test
+  * windows: support builder v2
+  * windows: update readme
+  * windows: Fix local build
+  * windows: update gitignore
+
+  [ Marek Marczykowski-Górecki ]
+  * ci: remove R4.1, add R4.3
+
+  [ Rafał Wojdyła ]
+  * windows: make libvchan_client_init() xenstore logic more clear
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 18 Mar 2025 20:37:21 +0100
+
 libvchan-xen (4.2.6-1) unstable; urgency=medium
 
   * debian: require pkg-config
