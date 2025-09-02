@@ -44,33 +44,28 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets">
-    <Import Project="$(SolutionDir)\dirs.props" Condition="exists('$(SolutionDir)\dirs.props')" Label="Installer include/lib directory overrides" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>$(SolutionDir)\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\..\..\include;$(QUBES_INCLUDES)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(QUBES_LIBS)</LibraryPath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\..\..\include;$(QUBES_INCLUDES);$(QUBES_REPO)\vmm-xen-windows-pvdrivers\inc</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(QUBES_LIBS);$(QUBES_REPO)\vmm-xen-windows-pvdrivers\lib</LibraryPath>
+    <IntDir>$(ProjectDir)\..\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)\..\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>$(SolutionDir)\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\..\..\include;$(QUBES_INCLUDES)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(QUBES_LIBS)</LibraryPath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\..\..\include;$(QUBES_INCLUDES);$(QUBES_REPO)\vmm-xen-windows-pvdrivers\inc</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(QUBES_LIBS);$(QUBES_REPO)\vmm-xen-windows-pvdrivers\lib</LibraryPath>
+    <IntDir>$(ProjectDir)\..\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)\..\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -79,8 +74,6 @@
       <PreprocessorDefinitions>_DEBUG;VCHAN_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -88,11 +81,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libxenvchan.lib;xencontrol.lib</AdditionalDependencies>
-      <IncrementalLinkDatabaseFile />
     </Link>
     <PreBuildEvent>
-      <Command>powershell $(ProjectDir)\..\..\set_version.ps1 $(ProjectDir)\..\..\..\version $(ProjectDir)\..\..\include\qwt_version.h</Command>
-      <Message>Generate qwt_version.h</Message>
+      <Command>powershell $(QB_SCRIPTS)\local\prebuild.ps1 $(ProjectDir)\..\..\.. $(QUBES_REPO) &amp;&amp; powershell $(QB_SCRIPTS)\set-version.ps1 $(ProjectDir)\..\..\..\version $(ProjectDir)\..\..\include\qwt_version.h</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -104,8 +95,6 @@
       <PreprocessorDefinitions>NDEBUG;VCHAN_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -114,14 +103,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);libxenvchan.lib;xencontrol.lib</AdditionalDependencies>
-      <IncrementalLinkDatabaseFile />
     </Link>
     <PreBuildEvent>
-      <Command>powershell $(ProjectDir)\..\..\set_version.ps1 $(ProjectDir)\..\..\..\version $(ProjectDir)\..\..\include\qwt_version.h</Command>
-      <Message>Generate qwt_version.h</Message>
+      <Command>powershell $(QB_SCRIPTS)\local\prebuild.ps1 $(ProjectDir)\..\..\.. $(QUBES_REPO) &amp;&amp; powershell $(QB_SCRIPTS)\set-version.ps1 $(ProjectDir)\..\..\..\version $(ProjectDir)\..\..\include\qwt_version.h</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
