@@ -1,3 +1,10 @@
+libvchan-xen (4.2.8-1) unstable; urgency=medium
+
+  [ Rafał Wojdyła ]
+  * windows: Fix local build, project cleanup
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 02 Jan 2026 02:21:41 +0100
+
 libvchan-xen (4.2.7-1) unstable; urgency=medium
 
   [ Rafał Wojdyła ]
