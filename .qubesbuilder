@@ -21,3 +21,5 @@ vm:
     - windows/include/libvchan.h
     lib:
     - windows/vs2022/x64/@CONFIGURATION@/libvchan/libvchan.lib
+    pdb:
+    - windows/vs2022/x64/@CONFIGURATION@/libvchan/libvchan.pdb
