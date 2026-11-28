@@ -60,6 +60,7 @@ libvchan_t *libvchan_server_init(int domain, int port, size_t read_min, size_t w
     ctrl->remote_domain = domain;
     if (!(ctrl->xc_handle = xc_interface_open(NULL, NULL, 0)))
         goto err_xc_open;
+    libvchan__watch_peer_death(ctrl);
     return ctrl;
 err_xc_open:
     libxenvchan_close(ctrl->xenvchan);
@@ -237,6 +238,7 @@ int libvchan_client_init_async_finish(libvchan_t *ctrl, bool blocking) {
     if (!ctrl->xenvchan)
         goto err;
     ctrl->xenvchan->blocking = blocking;
+    libvchan__watch_peer_death(ctrl);
     /* notify server */
     xc_evtchn_notify(ctrl->xenvchan->event, ctrl->xenvchan->event_port);
     return 0;

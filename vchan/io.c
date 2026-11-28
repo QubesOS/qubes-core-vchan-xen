@@ -27,32 +27,45 @@
 #include <xenstore.h>
 #include <xenctrl.h>
 #include <poll.h>
+#include <errno.h>
+#include <unistd.h>
+#ifndef CONFIG_STUBDOM
+#include <sys/epoll.h>
+#endif
 #include "libvchan.h"
 #include "libvchan_private.h"
+
+/*
+ * Check the remote domain with domctl: 1 alive, 0 dead or dying, -1 if
+ * domctl is not available (only a privileged domain can use it).
+ */
+static int libvchan__domctl_alive(xc_interface *xc_handle, int dom) {
+#ifdef HAVE_XC_DOMAIN_GETINFO_SINGLE
+    xc_domaininfo_t dominfo;
+    int ret = xc_domain_getinfo_single(xc_handle, dom, &dominfo);
+
+    if (ret == 0)
+        return !(dominfo.flags & XEN_DOMINF_dying);
+#else
+    xc_dominfo_t dominfo;
+    int ret = xc_domain_getinfo(xc_handle, dom, 1, &dominfo);
+
+    if (ret == 1)
+        return dominfo.domid == (uint32_t)dom && !dominfo.dying;
+#endif
+    if (ret == -1 && errno == ESRCH)
+        return 0;
+    return -1;
+}
 
 /* check if domain is still alive */
 int libvchan__check_domain_alive(xc_interface *xc_handle, int dom) {
     struct evtchn_status evst;
-#ifdef HAVE_XC_DOMAIN_GETINFO_SINGLE
-    xc_domaininfo_t dominfo;
-#else
-    xc_dominfo_t dominfo;
-#endif
     int ret;
 
-    /* first try using domctl, more reliable but available in a privileged
-     * domain only */
-#ifdef HAVE_XC_DOMAIN_GETINFO_SINGLE
-    ret = xc_domain_getinfo_single(xc_handle, dom, &dominfo);
-    if (ret == 0)
-        return !(dominfo.flags & XEN_DOMINF_dying);
-#else
-    ret = xc_domain_getinfo(xc_handle, dom, 1, &dominfo);
-    if (ret == 1)
-        return dominfo.domid == (uint32_t)dom && !dominfo.dying;
-#endif
-    else if (ret == -1 && errno == ESRCH)
-        return 0;
+    ret = libvchan__domctl_alive(xc_handle, dom);
+    if (ret >= 0)
+        return ret;
     /* otherwise fallback to xc_evtchn_status method */
 
     evst.dom = dom;
@@ -71,28 +84,211 @@ int libvchan__check_domain_alive(xc_interface *xc_handle, int dom) {
     return 1;
 }
 
+static void libvchan__arm_death_watch(libvchan_t *ctrl);
+
+/*
+ * Xen sends no vchan event when the remote domain dies, so a wait for one
+ * would never end. Watch @releaseDomain/<domid> next to the event channel
+ * (plain @releaseDomain, which fires for any domain, before Xen 4.22).
+ * Only privileged callers get that event; elsewhere nothing changes.
+ * libvchan_fd_for_select() returns the epoll fd; the watch joins it only
+ * once a client is connected, see libvchan__arm_death_watch().
+ */
+void libvchan__watch_peer_death(libvchan_t *ctrl) {
+#ifndef CONFIG_STUBDOM
+    struct xs_handle *xs;
+    struct epoll_event ev = { .events = EPOLLIN };
+    int epoll_fd;
+#ifdef HAVE_RELEASE_DOMAIN_DOMID_WATCH
+    char path[32];
+
+    snprintf(path, sizeof(path), "@releaseDomain/%d", ctrl->remote_domain);
+#else
+    const char *path = "@releaseDomain";
+#endif
+
+    if (libvchan__domctl_alive(ctrl->xc_handle, ctrl->remote_domain) != 1)
+        return;
+    xs = xs_open(0);
+    if (!xs) {
+        perror("xs_open");
+        return;
+    }
+    if (!xs_watch(xs, path, "release")) {
+        fprintf(stderr, "Cannot setup %s watch\n", path);
+        goto err_xs;
+    }
+    epoll_fd = epoll_create1(EPOLL_CLOEXEC);
+    if (epoll_fd < 0) {
+        perror("epoll_create1");
+        goto err_xs;
+    }
+    ev.data.fd = libxenvchan_fd_for_select(ctrl->xenvchan);
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, ev.data.fd, &ev)) {
+        perror("epoll_ctl");
+        goto err_epoll;
+    }
+    ctrl->death_xs = xs;
+    ctrl->epoll_fd = epoll_fd;
+    libvchan__arm_death_watch(ctrl);
+    return;
+err_epoll:
+    close(epoll_fd);
+err_xs:
+    xs_close(xs);
+#else
+    (void)ctrl;
+#endif
+}
+
+/*
+ * Add the watch to the epoll fd once connected. A server waiting for its
+ * client keeps it out: callers take a wakeup of that fd as "client
+ * connected", and the watch also fires when any other domain dies.
+ */
+static void libvchan__arm_death_watch(libvchan_t *ctrl) {
+#ifndef CONFIG_STUBDOM
+    struct epoll_event ev = { .events = EPOLLIN };
+    char **vec;
+
+    if (!ctrl->death_xs || ctrl->death_watch_armed ||
+            libxenvchan_is_open(ctrl->xenvchan) == 2)
+        return;
+    /* drop events queued so far (one fires right after xs_watch) */
+    while ((vec = xs_check_watch(ctrl->death_xs)))
+        free(vec);
+    ev.data.fd = xs_fileno(ctrl->death_xs);
+    if (epoll_ctl(ctrl->epoll_fd, EPOLL_CTL_ADD, ev.data.fd, &ev)) {
+        perror("epoll_ctl");
+        return;
+    }
+    ctrl->death_watch_armed = true;
+    if (!libvchan__check_domain_alive(ctrl->xc_handle, ctrl->remote_domain))
+        ctrl->peer_dead = true;
+#else
+    (void)ctrl;
+#endif
+}
+
+/*
+ * Wait for a vchan event, or return -1 once the remote domain is dying. With
+ * once, also return 0 after a watch event for a live domain (watches fire
+ * spuriously) instead of waiting more.
+ */
+static int libvchan__wait_event(libvchan_t *ctrl, bool once) {
+    struct pollfd fds[2];
+    char **vec;
+
+    if (ctrl->peer_dead)
+        return -1;
+    if (!ctrl->death_xs)
+        return libxenvchan_wait(ctrl->xenvchan);
+    libvchan__arm_death_watch(ctrl);
+    if (ctrl->peer_dead)
+        return -1;
+    fds[0] = (struct pollfd) {
+        .fd = libxenvchan_fd_for_select(ctrl->xenvchan), .events = POLLIN };
+    fds[1] = (struct pollfd) {
+        .fd = xs_fileno(ctrl->death_xs), .events = POLLIN };
+    for (;;) {
+        if (poll(fds, ctrl->death_watch_armed ? 2 : 1, -1) < 0) {
+            /* poll() is never restarted by SA_RESTART, unlike read() */
+            if (errno == EINTR)
+                continue;
+            perror("poll");
+            return -1;
+        }
+        if (ctrl->death_watch_armed && fds[1].revents) {
+            while ((vec = xs_check_watch(ctrl->death_xs)))
+                free(vec);
+            if (!libvchan__check_domain_alive(ctrl->xc_handle, ctrl->remote_domain)) {
+                ctrl->peer_dead = true;
+                return -1;
+            }
+        }
+        if (fds[0].revents)
+            return libxenvchan_wait(ctrl->xenvchan);
+        if (once)
+            return 0;
+    }
+}
+
+/*
+ * With the watch, the blocking paths below call libxenvchan only once it can
+ * complete without waiting, and do the waiting in libvchan__wait_event(). A
+ * failed wait ends the call only if what it waited for is still missing, so
+ * data written just before the remote domain died is not lost.
+ */
+
 int libvchan_write(libvchan_t *ctrl, const void *data, size_t size) {
-    if (!ctrl->xenvchan) {
+    struct libxenvchan *xenvchan = ctrl->xenvchan;
+    size_t pos = 0;
+
+    if (!xenvchan) {
         errno = EAGAIN;
         return -1;
     }
-    return libxenvchan_write(ctrl->xenvchan, (char*)data, size);
+    if (!xenvchan->blocking || !ctrl->death_xs)
+        return libxenvchan_write(xenvchan, (char*)data, size);
+    if (!libxenvchan_is_open(xenvchan))
+        return -1;
+    while (pos < size) {
+        int space, ret;
+
+        if (!libxenvchan_is_open(xenvchan))
+            return -1;
+        space = libxenvchan_buffer_space(xenvchan);
+        if (space == 0) {
+            if (libvchan__wait_event(ctrl, false) &&
+                    libxenvchan_buffer_space(xenvchan) == 0)
+                return -1;
+            continue;
+        }
+        if ((size_t)space > size - pos)
+            space = size - pos;
+        ret = libxenvchan_write(xenvchan, (char*)data + pos, space);
+        if (ret < 0)
+            return -1;
+        pos += ret;
+    }
+    return pos;
 }
 
 int libvchan_send(libvchan_t *ctrl, const void *data, size_t size) {
-    if (!ctrl->xenvchan) {
+    struct libxenvchan *xenvchan = ctrl->xenvchan;
+
+    if (!xenvchan) {
         errno = EAGAIN;
         return -1;
     }
-    return libxenvchan_send(ctrl->xenvchan, (char*)data, size);
+    if (xenvchan->blocking && ctrl->death_xs &&
+            size <= (1U << xenvchan->write.order)) {
+        while (libxenvchan_is_open(xenvchan) &&
+               (size_t)libxenvchan_buffer_space(xenvchan) < size) {
+            if (libvchan__wait_event(ctrl, false) &&
+                    (size_t)libxenvchan_buffer_space(xenvchan) < size)
+                return -1;
+        }
+    }
+    return libxenvchan_send(xenvchan, (char*)data, size);
 }
 
 int libvchan_read(libvchan_t *ctrl, void *data, size_t size) {
-    if (!ctrl->xenvchan) {
+    struct libxenvchan *xenvchan = ctrl->xenvchan;
+
+    if (!xenvchan) {
         errno = EAGAIN;
         return -1;
     }
-    return libxenvchan_read(ctrl->xenvchan, (char*)data, size);
+    if (xenvchan->blocking && ctrl->death_xs) {
+        while (libxenvchan_data_ready(xenvchan) == 0 &&
+               libxenvchan_is_open(xenvchan)) {
+            if (libvchan__wait_event(ctrl, false) &&
+                    libxenvchan_data_ready(xenvchan) == 0)
+                return -1;
+        }
+    }
+    return libxenvchan_read(xenvchan, (char*)data, size);
 }
 
 void libvchan_set_blocking(libvchan_t *ctrl, bool blocking) {
@@ -103,11 +299,22 @@ void libvchan_set_blocking(libvchan_t *ctrl, bool blocking) {
 }
 
 int libvchan_recv(libvchan_t *ctrl, void *data, size_t size) {
-    if (!ctrl->xenvchan) {
+    struct libxenvchan *xenvchan = ctrl->xenvchan;
+
+    if (!xenvchan) {
         errno = EAGAIN;
         return -1;
     }
-    return libxenvchan_recv(ctrl->xenvchan, (char*)data, size);
+    if (xenvchan->blocking && ctrl->death_xs &&
+            size <= (1U << xenvchan->read.order)) {
+        while ((size_t)libxenvchan_data_ready(xenvchan) < size &&
+               libxenvchan_is_open(xenvchan)) {
+            if (libvchan__wait_event(ctrl, false) &&
+                    (size_t)libxenvchan_data_ready(xenvchan) < size)
+                return -1;
+        }
+    }
+    return libxenvchan_recv(xenvchan, (char*)data, size);
 }
 
 int libvchan_wait(libvchan_t *ctrl) {
@@ -129,10 +336,8 @@ int libvchan_wait(libvchan_t *ctrl) {
          *
          * During normal operation this shouldn't be long - in most cases vchan
          * client will connect almost instantly. So this sleep(10) loop will
-         * not hurt. Alternativelly it could be implemented with
-         * xs_watch("@releaseDomain"), but such approach will slow down most
-         * common execution path (xs_open+xs_watch even if client connects
-         * right away).
+         * not hurt. The @releaseDomain watch (privileged callers only) is
+         * not used here, see libvchan__arm_death_watch().
          */
         while (ret == -2 && libxenvchan_is_open(ctrl->xenvchan) == 2) {
             int vchan_fd = libxenvchan_fd_for_select(ctrl->xenvchan);
@@ -156,7 +361,7 @@ int libvchan_wait(libvchan_t *ctrl) {
             }
         }
     }
-    ret = libxenvchan_wait(ctrl->xenvchan);
+    ret = libvchan__wait_event(ctrl, true);
     if (ctrl->xs_path) {
         xs_transaction_t trans;
         char *xs_dir_path, *last_slash;
@@ -221,6 +426,10 @@ void libvchan_close(libvchan_t *ctrl) {
     /* this releases watches too */
     if (ctrl->xs)
         xs_close(ctrl->xs);
+    if (ctrl->death_xs) {
+        close(ctrl->epoll_fd);
+        xs_close(ctrl->death_xs);
+    }
     if (ctrl->xc_handle)
         xc_interface_close(ctrl->xc_handle);
     free(ctrl);
@@ -231,6 +440,8 @@ EVTCHN libvchan_fd_for_select(libvchan_t *ctrl) {
         errno = EAGAIN;
         return -1;
     }
+    if (ctrl->death_xs)
+        return ctrl->epoll_fd;
     return libxenvchan_fd_for_select(ctrl->xenvchan);
 }
 
@@ -252,6 +463,8 @@ int libvchan_is_open(libvchan_t *ctrl) {
 
     if (!ctrl->xenvchan)
         return VCHAN_WAITING;
+    if (ctrl->peer_dead)
+        return VCHAN_DISCONNECTED;
 
     ret = libxenvchan_is_open(ctrl->xenvchan);
     if (ret == 2) {
