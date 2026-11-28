@@ -36,8 +36,16 @@ struct libvchan {
     int port;
     xc_interface *xc_handle;
     struct xs_handle *xs;
+    /* @releaseDomain watch; NULL if not available */
+    struct xs_handle *death_xs;
+    /* event channel fd (+ death_xs fd once armed), valid only with death_xs */
+    int epoll_fd;
+    bool death_watch_armed;
+    /* the remote domain died: wait calls fail at once */
+    bool peer_dead;
 };
 
 int libvchan__check_domain_alive(xc_interface *xc_handle, int dom);
+void libvchan__watch_peer_death(libvchan_t *ctrl);
 
 #endif
