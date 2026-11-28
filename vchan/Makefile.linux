@@ -31,6 +31,9 @@ all: libvchan-xen.so vchan-xen.pc
 XENCTRL_VERSION := $(shell pkg-config --modversion xencontrol)
 CFLAGS += $(shell if printf '%s\n' '4.18.0' '$(XENCTRL_VERSION)' | \
                   sort -CV; then echo -DHAVE_XC_DOMAIN_GETINFO_SINGLE; fi)
+# xenstored supports @releaseDomain/<domid> watches since Xen 4.22
+CFLAGS += $(shell if printf '%s\n' '4.22.0' '$(XENCTRL_VERSION)' | \
+                  sort -CV; then echo -DHAVE_RELEASE_DOMAIN_DOMID_WATCH; fi)
 SO_VER = 1
 
 libvchan-xen.so.$(SO_VER): init.o io.o

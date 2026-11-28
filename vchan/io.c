@@ -88,8 +88,8 @@ static void libvchan__arm_death_watch(libvchan_t *ctrl);
 
 /*
  * Xen sends no vchan event when the remote domain dies, so a wait for one
- * would never end. Watch @releaseDomain next to the event channel (not
- * @releaseDomain/<domid>: xenstored supports that only since Xen 4.22).
+ * would never end. Watch @releaseDomain/<domid> next to the event channel
+ * (plain @releaseDomain, which fires for any domain, before Xen 4.22).
  * Only privileged callers get that event; elsewhere nothing changes.
  * libvchan_fd_for_select() returns the epoll fd; the watch joins it only
  * once a client is connected, see libvchan__arm_death_watch().
@@ -99,6 +99,13 @@ void libvchan__watch_peer_death(libvchan_t *ctrl) {
     struct xs_handle *xs;
     struct epoll_event ev = { .events = EPOLLIN };
     int epoll_fd;
+#ifdef HAVE_RELEASE_DOMAIN_DOMID_WATCH
+    char path[32];
+
+    snprintf(path, sizeof(path), "@releaseDomain/%d", ctrl->remote_domain);
+#else
+    const char *path = "@releaseDomain";
+#endif
 
     if (libvchan__domctl_alive(ctrl->xc_handle, ctrl->remote_domain) != 1)
         return;
@@ -107,8 +114,8 @@ void libvchan__watch_peer_death(libvchan_t *ctrl) {
         perror("xs_open");
         return;
     }
-    if (!xs_watch(xs, "@releaseDomain", "release")) {
-        fprintf(stderr, "Cannot setup @releaseDomain watch\n");
+    if (!xs_watch(xs, path, "release")) {
+        fprintf(stderr, "Cannot setup %s watch\n", path);
         goto err_xs;
     }
     epoll_fd = epoll_create1(EPOLL_CLOEXEC);
